@@ -11,5 +11,6 @@ router.put("/update-user-info/:id", verifyToken, verifyAdmin, adminControllers.u
 router.put("/get-user-info/:id", verifyToken, verifyAdmin, adminControllers.getUserInfoById);
 router.put("/get-all-users", verifyToken, verifyAdmin, adminControllers.getAllUsers);
 router.post("/add-story", verifyToken, verifyAdmin, adminControllers.createStoryWithScenes);
+router.get("/get-all-manner-tags", adminControllers.getAllMannerTags);
 
 export default router;

@@ -6,7 +6,8 @@ import TwilioService from '../helpers/twilioService.js'
 import EmailService from '../helpers/SendMail.js'
 import { generateOTP } from "../utils/generateOTP.js";
 import jwt from 'jsonwebtoken';
-
+import {negativeMannerTags} from "../helpers/NegativeMannerTags.js"
+import { positiveMannerTags } from "../helpers/PositiveMannerTags.js"
 
 class adminController {
     constructor() {
@@ -16,6 +17,7 @@ class adminController {
         this.udpateUserInfoById = this.udpateUserInfoById.bind(this);
         this.getUserInfoById = this.getUserInfoById.bind(this);
         this.getAllUsers = this.getAllUsers.bind(this);
+        this.getAllMannerTags = this.getAllMannerTags.bind(this);
     }
 
     async getMyDetails(req: Request, res: Response) {
@@ -253,6 +255,30 @@ class adminController {
             });
         } catch (error) {
             console.error("Error in createStoryWithScenes:", error);
+            return ResponseHandler.send(res, {
+                statusCode: 500,
+                status: "error",
+                msgCode: 500,
+                msg: getMessage(500, languageCode),
+                data: null,
+            });
+        }
+    }
+    async getAllMannerTags(req: Request, res: Response) {
+        let languageCode = (req.headers["language"] as string) || "en"; 
+        try {
+
+            let mannerTags = {positiveMannerTags,negativeMannerTags};
+
+            return ResponseHandler.send(res, {
+                statusCode: 200,
+                status: "success",
+                msgCode: 1013, // 
+                msg: getMessage(1013, languageCode),
+                data: mannerTags,
+            });
+        } catch (error) {
+            console.error("Error in getAllmannerTags:", error);
             return ResponseHandler.send(res, {
                 statusCode: 500,
                 status: "error",
