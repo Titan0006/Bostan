@@ -18,7 +18,8 @@
     "1015":"Password updated successfully",
     "1016":"Password cannot be empty",
     "1017":"No user found .",
-    "1018":"You are not authorised Admin.",
+    "1018":"You are not an authorised Admin.",
     "1019":"Your account have been deleted.Please contact support.",
-    "1020":"Your account have been deactivated.Please contact support."
+    "1020":"Your account have been deactivated.Please contact support.",
+    "1021":"Story details is required"
 }

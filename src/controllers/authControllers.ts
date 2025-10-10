@@ -294,17 +294,6 @@ class AuthController {
                 })
             }
 
-            const matchPassword = await userExists.comparePassword(password);
-            if (!matchPassword) {
-                return ResponseHandler.send(res, {
-                    statusCode: 400,
-                    status: "error",
-                    msgCode: 1005,
-                    msg: getMessage(1005, languageCode),
-                    data: null
-                })
-            }
-
             let secret_key = "Secret_Key";
             const token = jwt.sign({ email, id: userExists._id, type: 'user' }, secret_key, {
                 expiresIn: '10y'

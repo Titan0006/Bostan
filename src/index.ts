@@ -3,13 +3,15 @@ import dotenv from 'dotenv';
 import routes from './routes/index.js';
 import morgan from "morgan";
 import {connectDB} from "./config/MongoDB.js"
+import { initiateAdmin } from "./helpers/initiateAdmin.js";
+
 dotenv.config();
 
 const app = express();
 
 const PORT = process.env.PORT || 3000;
 const mongoURI = process.env.mongoURI || "";
-
+initiateAdmin()
 connectDB(mongoURI).then(()=>{
     app.use(morgan("dev"));
     app.use(express.json());

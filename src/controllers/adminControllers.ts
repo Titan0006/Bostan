@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
-import { User, OTP, Admin } from "../models/index.js";
+import { User, OTP, Admin, Story, StoryScenes } from "../models/index.js";
 import ResponseHandler from '../utils/responseHandler.js'
 import getMessage from '../i18n/index.js'
 import TwilioService from '../helpers/twilioService.js'
 import EmailService from '../helpers/SendMail.js'
 import { generateOTP } from "../utils/generateOTP.js";
 import jwt from 'jsonwebtoken';
+
 
 class adminController {
     constructor() {
@@ -127,8 +128,8 @@ class adminController {
                 })
             }
 
-            if((body.isDelete && body.isDelete===true) ||  body.isActive===false){
-                
+            if ((body.isDelete && body.isDelete === true) || body.isActive === false) {
+
             }
             const updated_user = await User.findByIdAndUpdate(id, body, { new: true });
             return ResponseHandler.send(res, {
@@ -209,6 +210,56 @@ class adminController {
                 msg: getMessage(500, languageCode),
                 data: null
             })
+        }
+    }
+    async createStoryWithScenes(req: Request, res: Response) {
+        let languageCode = (req.headers["language"] as string) || "en"; 
+        try {
+            const { story, scenes } = req.body;
+
+            if (!story) {
+                return ResponseHandler.send(res, {
+                    statusCode: 400,
+                    status: "error",
+                    msgCode: 1021, // 🔹 choose a msgCode for "Story data required"
+                    msg: getMessage(1021, languageCode),
+                    data: null,
+                });
+            }
+
+            // 1. Save story
+            const newStory = await Story.create(story);
+
+            // 2. Save scenes linked with storyId
+            let savedScenes: any[] = [];
+            if (Array.isArray(scenes) && scenes.length > 0) {
+                const scenesWithStoryId = scenes.map((scene) => ({
+                    ...scene,
+                    storyId: newStory._id,
+                }));
+
+                savedScenes = await StoryScenes.insertMany(scenesWithStoryId);
+            }
+
+            return ResponseHandler.send(res, {
+                statusCode: 201,
+                status: "success",
+                msgCode: 1014, // 
+                msg: getMessage(1014, languageCode),
+                data: {
+                    story: newStory,
+                    scenes: savedScenes,
+                },
+            });
+        } catch (error) {
+            console.error("Error in createStoryWithScenes:", error);
+            return ResponseHandler.send(res, {
+                statusCode: 500,
+                status: "error",
+                msgCode: 500,
+                msg: getMessage(500, languageCode),
+                data: null,
+            });
         }
     }
 }
