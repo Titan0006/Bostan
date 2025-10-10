@@ -21,5 +21,7 @@
     "1018":"You are not an authorised Admin.",
     "1019":"Your account have been deleted.Please contact support.",
     "1020":"Your account have been deactivated.Please contact support.",
-    "1021":"Story details is required"
+    "1021":"Story details is required",
+    "1022":"No image uploaded",
+    "1023":"Image uploaded successfully"
 }

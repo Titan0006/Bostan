@@ -6,12 +6,14 @@ import TwilioService from '../helpers/twilioService.js'
 import EmailService from '../helpers/SendMail.js'
 import { generateOTP } from "../utils/generateOTP.js";
 import jwt from 'jsonwebtoken';
+import { uploadFile } from "../config/cloudinary.js";
 
 class userController {
     constructor() {
         this.getMyDetails = this.getMyDetails.bind(this);
         this.updateMyDetails = this.updateMyDetails.bind(this);
         this.changePassword = this.changePassword.bind(this);
+        this.uploadFile = this.uploadFile.bind(this);
     }
 
     async getMyDetails(req: Request, res: Response) {
@@ -95,6 +97,41 @@ class userController {
             })
         } catch (error) {
             console.error("Error in userSignup of AuthController", error);
+            return ResponseHandler.send(res, {
+                statusCode: 500,
+                status: "error",
+                msgCode: 500,
+                msg: getMessage(500, languageCode),
+                data: null
+            })
+        }
+    }
+    async uploadFile(req: Request, res: Response) {
+        let languageCode = req.headers["language"] as string || "en";
+        try {
+
+            console.log("Incoming fileeeeeeeeeeee",(req as any).files[0])
+            if (!req.files) {
+                return ResponseHandler.send(res, {
+                    statusCode: 400,
+                    status: "error",
+                    msgCode: 1022,
+                    msg: getMessage(1022, languageCode),
+                    data: null
+                });
+            }
+            const result = await uploadFile((req as any).files[0].path,"bostan_app_file");
+            console.log("Resulttttttttttttttttttttttt",result)
+
+            return ResponseHandler.send(res, {
+                statusCode: 200,
+                status: "success",
+                msgCode: 1023,
+                msg: getMessage(1023, languageCode),
+                data: result.url
+            })
+        } catch (error) {
+            console.error("Error in uploadFile of AuthController", error);
             return ResponseHandler.send(res, {
                 statusCode: 500,
                 status: "error",
