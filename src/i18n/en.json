@@ -23,5 +23,13 @@
     "1020":"Your account have been deactivated.Please contact support.",
     "1021":"Story details is required",
     "1022":"No image uploaded",
-    "1023":"Image uploaded successfully"
+    "1023":"Image uploaded successfully",
+    "1024":"No story found",
+    "1025":"Updated successfully",
+    "1026":"Story created successfully",
+    "1027":"New scene added to story.",
+    "1028":"No scene found .",
+    "1029":"Deleted successfully",
+    "1030":"No scene found",
+    "1031":"No story scene found"
 }

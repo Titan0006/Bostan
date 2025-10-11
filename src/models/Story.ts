@@ -3,9 +3,12 @@ import { Schema, model } from "mongoose";
 
 const storySchema = new Schema<IStory>( // poster,logo,logline,plotSummary,mannerTags
   {
-    posters: [{ type: String, trim: true, required: false }],
+    title:{type:String,trim:true,required:true,default:''},
+    logo: { type: String, trim: true, required: false,default:'' },
+    base_poster: { type: String, trim: true, required: false },
+    landscape_poster: { type: String, trim: true, required: false },
+    portrait_poster: { type: String, trim: true, required: false },
     plotSummary: { type: String, trim: true, required: false },
-    logo: { type: String, trim: true, required: false },
     logline: { type: String, default: "", required: false },
     status: { type: String, default: "draft",enum:['draft','published'], required: false },
     mannerTags: [{ type: Schema.Types.ObjectId, ref: 'MannerTags', index: true }],
