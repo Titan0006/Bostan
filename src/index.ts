@@ -22,7 +22,7 @@ connectDB(mongoURI).then(()=>{
     app.use('/api',routes);
     
     app.listen(PORT,'0.0.0.0',()=>{
-        console.log(`Server is listening on http://localhost:${PORT}`)
+        console.log(`Server is listening on http://0.0.0.0:${PORT} or http://54.89.214.1:${PORT}`);
     })
 }).catch((error)=>{
     console.error("Failed to start the server due to Database error",error)
