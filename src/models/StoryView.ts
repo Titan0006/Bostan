@@ -1,15 +1,15 @@
-// import { IUser } from "./interfaces/index.js";
-// import { Schema, model } from "mongoose";
-// import bcrypt from "bcrypt";
+import { IStoryView } from "./interfaces/index.js";
+import { Schema, model } from "mongoose";
+import bcrypt from "bcrypt";
 
-// const userSchema = new Schema<IUser>(
-//   {
-//     deviceId: { type: String, trim: true, required: false },
-//     isSubscribed: { type: Boolean, default: false, required: false },
-//   },
-//   { timestamps: true }
-// );
+const storyViewSchema = new Schema<IStoryView>(//userId,storyId
+  {
+    userId: { type: Schema.Types.ObjectId, ref:'User', required: false },
+    storyId: { type: Schema.Types.ObjectId, ref:'Story', required: false }
+  },
+  { timestamps: true }
+);
 
-// const User = model<IUser>("User", userSchema, "User");
+const StoryView = model<IStoryView>("StoryView", storyViewSchema, "StoryView");
 
-// export default User;
+export default StoryView;

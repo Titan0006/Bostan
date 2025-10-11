@@ -9,5 +9,10 @@ router.post("/me",verifyToken,verifyUser,userControllers.getMyDetails);
 router.put("/update-me",verifyToken,verifyUser,userControllers.updateMyDetails);
 router.put("/change-password",verifyToken,verifyUser,userControllers.changePassword);
 router.post("/upload-file",upload.any(),userControllers.uploadFile);
+// router.get("/get-dashboard",verifyToken,verifyUser,userControllers.getDashboard);
+router.get("/get-library",verifyToken,verifyUser,userControllers.getLibrary);
+router.get("/get-story/:id",verifyToken,verifyUser,userControllers.viewStory); // to view story
+router.post("/review-story",verifyToken,verifyUser,userControllers.createReviewOfStory); // to view story
+router.post("/review-story/:id",verifyToken,verifyUser,userControllers.createReviewOfStory); // to view story
 
 export default router;

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { User, OTP, Admin, Story, StoryScenes } from "../models/index.js";
+import { User, OTP, Admin, Story, StoryScenes, StoryOfTheWeek } from "../models/index.js";
 import ResponseHandler from '../utils/responseHandler.js'
 import getMessage from '../i18n/index.js'
 import TwilioService from '../helpers/twilioService.js'
@@ -24,6 +24,7 @@ class adminController {
         this.deleteStoryById = this.deleteStoryById.bind(this);
         this.deleteStorySceneById = this.deleteStorySceneById.bind(this);
         this.getStorySceneById = this.getStorySceneById.bind(this);
+        this.addStoryOfTheWeek = this.addStoryOfTheWeek.bind(this);
     }
 
     async getMyDetails(req: Request, res: Response) {
@@ -367,6 +368,33 @@ class adminController {
             });
         }
     }
+    async addStoryOfTheWeek(req: Request, res: Response) {
+        let languageCode = (req.headers["language"] as string) || "en";
+        try {
+            const { storyId } = req.body;
+
+            await StoryOfTheWeek.deleteMany({})
+
+            await StoryOfTheWeek.create({storyId});
+
+            return ResponseHandler.send(res, {
+                statusCode: 201,
+                status: "success",
+                msgCode: 1032, 
+                msg: getMessage(1032, languageCode),
+                data: null,
+            });
+        } catch (error) {
+            console.error("Error in createStoryWithScenes:", error);
+            return ResponseHandler.send(res, {
+                statusCode: 500,
+                status: "error",
+                msgCode: 500,
+                msg: getMessage(500, languageCode),
+                data: null,
+            });
+        }
+    }
     async getAllMannerTags(req: Request, res: Response) {
         let languageCode = (req.headers["language"] as string) || "en";
         try {
@@ -549,6 +577,8 @@ class adminController {
                     data: null,
                 });
             }
+
+            await StoryScenes.deleteMany({storyId:id})
 
             return ResponseHandler.send(res, {
                 statusCode: 200,

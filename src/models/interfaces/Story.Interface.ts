@@ -11,5 +11,6 @@ export interface IStory {
   plotSummary:string,
   status: string,
   mannerTags:string[],
-  is_featured:boolean
+  is_featured:boolean,
+  banner_story:boolean
 }

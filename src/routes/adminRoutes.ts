@@ -13,6 +13,7 @@ router.put("/get-all-users", verifyToken, verifyAdmin, adminControllers.getAllUs
 router.post("/add-story", verifyToken, verifyAdmin, adminControllers.createStoryWithScenes);
 router.post("/add-story/:id", verifyToken, verifyAdmin, adminControllers.createStoryWithScenes);
 router.post("/add-story", verifyToken, verifyAdmin, adminControllers.createStoryWithScenes);
+router.post("/story-of-the-week", verifyToken, verifyAdmin, adminControllers.addStoryOfTheWeek);
 router.post("/add-story-scene", verifyToken, verifyAdmin, adminControllers.createStoryScenes);
 router.post("/add-story-scene/:id", verifyToken, verifyAdmin, adminControllers.createStoryScenes);
 router.get("/get-all-manner-tags", adminControllers.getAllMannerTags);

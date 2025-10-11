@@ -11,6 +11,7 @@ const storySchema = new Schema<IStory>( // poster,logo,logline,plotSummary,manne
     plotSummary: { type: String, trim: true, required: false },
     logline: { type: String, default: "", required: false },
     is_featured: { type: Boolean, default: false, required: false },
+    banner_story: { type: Boolean, default: false, required: false },
     status: {
       type: String,
       default: "draft",

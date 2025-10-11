@@ -2,6 +2,6 @@ import { Types } from "mongoose";
 
 export interface IStoryView {
   _id: Types.ObjectId;
-  userId: string;
+  userId: Types.ObjectId;
   storyId:Types.ObjectId;
 }

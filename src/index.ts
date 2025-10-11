@@ -9,7 +9,7 @@ dotenv.config();
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT || "3000", 10);
 const mongoURI = process.env.mongoURI || "";
 initiateAdmin()
 connectDB(mongoURI).then(()=>{
@@ -20,7 +20,7 @@ connectDB(mongoURI).then(()=>{
     });
     app.use('/api',routes);
     
-    app.listen(PORT,()=>{
+    app.listen(PORT,'0.0.0.0',()=>{
         console.log(`Server is listening on http://localhost:${PORT}`)
     })
 }).catch((error)=>{
