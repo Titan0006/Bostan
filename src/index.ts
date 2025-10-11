@@ -13,6 +13,7 @@ const PORT = parseInt(process.env.PORT || "3000", 10);
 const mongoURI = process.env.mongoURI || "";
 initiateAdmin()
 connectDB(mongoURI).then(()=>{
+    console.log("mongggooooooooooooooooooooooooooooooooooooooooooooooo",mongoURI)
     app.use(morgan("dev"));
     app.use(express.json());
     app.get('/',(req:Request,res:Response)=>{
