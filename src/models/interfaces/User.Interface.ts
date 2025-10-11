@@ -1,7 +1,12 @@
 import { Types } from "mongoose";
 
-export interface IUser {
+export interface IUser { 
   _id: Types.ObjectId;
-  deviceId: string;
-  isSubscribed:boolean; 
+  first_name:string;
+  last_name:string;
+  email:string;
+  password:string;
+  subscription_plan:string;
+  is_active:boolean;
+  is_deleted:boolean;
 }

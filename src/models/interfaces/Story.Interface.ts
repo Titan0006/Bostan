@@ -10,5 +10,6 @@ export interface IStory {
   logline:string,
   plotSummary:string,
   status: string,
-  mannerTags:Types.ObjectId[]
+  mannerTags:string[],
+  is_featured:boolean
 }

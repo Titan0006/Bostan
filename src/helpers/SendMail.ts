@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+dotenv.config()
 
 const userEmail = process.env.GMAIL_USER;
 const userPass = process.env.GMAIL_PASS;

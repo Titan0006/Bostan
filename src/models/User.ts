@@ -4,11 +4,39 @@ import bcrypt from "bcrypt";
 
 const userSchema = new Schema<IUser>(
   {
-    deviceId: { type: String, trim: true, required: false },
-    isSubscribed: { type: Boolean, default: false, required: false },
+    first_name: { type: String, trim: true, required: false },
+    last_name: { type: String, trim: true, required: false },
+    email: { type: String, trim: true, required: false },
+    password: { type: String, trim: true, required: false },
+    subscription_plan: {
+      type: String,
+      trim: true,
+      required: false,
+      default: "free_trial",
+      enum: ["free_trial", "monthly", "yearly"],
+    },
+    is_active: { type: Boolean, default: true, required: false },
+    is_deleted: { type: Boolean, default: false, required: false },
   },
   { timestamps: true }
 );
+
+userSchema.pre('save',async function(next){
+  if(!this.isModified){
+    return next();
+  }
+  try{
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password,salt);
+    next();
+  }catch(error:any){
+    next(error);
+  }
+})
+
+userSchema.methods.comparePassword = async function (candidatePassword:string){
+  return await bcrypt.compare(candidatePassword,this.Password)
+}
 
 const User = model<IUser>("User", userSchema, "User");
 
