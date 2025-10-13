@@ -18,7 +18,8 @@ const storySchema = new Schema<IStory>( // poster,logo,logline,plotSummary,manne
       enum: ["draft", "published"],
       required: false,
     },
-    mannerTags: [{ type: String, default: "", required: false }],
+    positiveMannerTags: [{ type: String, default: "", required: false }],
+    negativeMannerTags: [{ type: String, default: "", required: false }],
   },
   { timestamps: true }
 );

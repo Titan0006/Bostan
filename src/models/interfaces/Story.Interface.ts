@@ -10,7 +10,8 @@ export interface IStory {
   logline:string,
   plotSummary:string,
   status: string,
-  mannerTags:string[],
+  positiveMannerTags:string[],
+  negativeMannerTags:string[],
   is_featured:boolean,
   banner_story:boolean
 }
