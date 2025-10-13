@@ -269,7 +269,7 @@ class adminController {
                 const updateStory = await Story.findByIdAndUpdate(id, { ...story }, { new: true })
 
                 return ResponseHandler.send(res, {
-                    statusCode: 201,
+                    statusCode: 200,
                     status: "success",
                     msgCode: 1025,
                     msg: getMessage(1025, languageCode),
@@ -293,7 +293,7 @@ class adminController {
             }
 
             return ResponseHandler.send(res, {
-                statusCode: 201,
+                statusCode: 200,
                 status: "success",
                 msgCode: 1026, // 
                 msg: getMessage(1026, languageCode),
@@ -337,7 +337,7 @@ class adminController {
                 const updateScene = await StoryScenes.findByIdAndUpdate(id, req.body, { new: true });
 
                 return ResponseHandler.send(res, {
-                    statusCode: 201,
+                    statusCode: 200,
                     status: "success",
                     msgCode: 1025,
                     msg: getMessage(1025, languageCode),
@@ -351,7 +351,7 @@ class adminController {
             })
 
             return ResponseHandler.send(res, {
-                statusCode: 201,
+                statusCode: 200,
                 status: "success",
                 msgCode: 1027, // 
                 msg: getMessage(1027, languageCode),
@@ -378,7 +378,7 @@ class adminController {
             await StoryOfTheWeek.create({storyId});
 
             return ResponseHandler.send(res, {
-                statusCode: 201,
+                statusCode: 200,
                 status: "success",
                 msgCode: 1032, 
                 msg: getMessage(1032, languageCode),

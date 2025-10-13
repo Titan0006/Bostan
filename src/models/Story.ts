@@ -3,7 +3,7 @@ import { Schema, model } from "mongoose";
 
 const storySchema = new Schema<IStory>( // poster,logo,logline,plotSummary,mannerTags
   {
-    title: { type: String, trim: true, required: true, default: "" },
+    title: { type: String, trim: true, required: true, default: "" },  // title,
     logo: { type: String, trim: true, required: false, default: "" },
     base_poster: { type: String, trim: true, required: false },
     landscape_poster: { type: String, trim: true, required: false },
