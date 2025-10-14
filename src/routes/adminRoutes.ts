@@ -17,7 +17,7 @@ router.post("/story-of-the-week", verifyToken, verifyAdmin, adminControllers.add
 router.post("/add-story-scene", verifyToken, verifyAdmin, adminControllers.createStoryScenes);
 router.post("/add-story-scene/:id", verifyToken, verifyAdmin, adminControllers.createStoryScenes);
 router.get("/get-all-manner-tags", adminControllers.getAllMannerTags);
-// router.get("/get-all-dashboard", adminControllers.getAllDashboard);
+router.get("/get-all-users-count", adminControllers.getAllUsersCount);
 router.get("/get-all-featured-stories", adminControllers.getAllFeaturedStories);
 router.get("/get-all-banner-stories", adminControllers.getAllBannerStories);
 router.get("/get-all-stories", verifyToken, verifyAdmin, adminControllers.getAllStories);

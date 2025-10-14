@@ -9,6 +9,7 @@ import { IStoryView } from "./StoryView.Interface.js";
 import { IStoryScenes } from "./StoryScenes.Interface.js";
 import { IStoryOfTheWeek } from "./StoryOfTheWeek.Interface.js";
 import { IStoryReview } from "./StoryReview.Interface.js";
+import {IUserActivity} from "./UserActivity.Interface.js";
 
 export {
   IUser,
@@ -22,4 +23,5 @@ export {
   IStoryScenes,
   IStoryOfTheWeek,
   IStoryReview,
+  IUserActivity
 };

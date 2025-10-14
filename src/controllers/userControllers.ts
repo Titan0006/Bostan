@@ -8,6 +8,7 @@ import {
   StoryView,
   StoryReview,
   StoryScenes,
+  UserActivity,
 } from "../models/index.js";
 import ResponseHandler from "../utils/responseHandler.js";
 import getMessage from "../i18n/index.js";
@@ -239,6 +240,19 @@ class userController {
         })
       );
 
+      let userId = (req as any).user.id;
+
+      const twentyFourHourAgo = new Date(Date.now()-24*60*60*1000);
+      const recentActivity = await UserActivity.findOne({
+        userId:userId,
+        createdAt:{$gte:twentyFourHourAgo}
+      })
+
+      if(!recentActivity){
+        await UserActivity.create({userId})
+      }
+
+      
       return ResponseHandler.send(res, {
         statusCode: 200,
         status: "success",

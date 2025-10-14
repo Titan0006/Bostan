@@ -7,7 +7,8 @@ import Review from "./Review.js";
 import StoryScenes from "./StoryScenes.js";
 import StoryOfTheWeek from "./StoryOfTheWeek.js";
 import StoryReview from "./StoryReviews.js";
+import UserActivity from "./UserActivity.js";
 
 export {
-    User, Admin, OTP, Story, StoryScenes, Review,StoryOfTheWeek,StoryView,StoryReview
+    User, Admin, OTP, Story, StoryScenes, Review,StoryOfTheWeek,StoryView,StoryReview,UserActivity
 }
