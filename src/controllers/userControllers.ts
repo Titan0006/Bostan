@@ -478,11 +478,11 @@ class userController {
       let stories = await Story.find(filter)
         .skip(skip)
         .limit(limit)
-        .sort({ createdAt: -1 }); // optional: sort by latest
+        .sort({ createdAt: -1 }).lean(); // optional: sort by latest
 
       stories = await Promise.all(
         stories.map(async (s:any) => {
-          const all_scenes = await StoryScenes.find({ storyId: s._id });
+          const all_scenes = await StoryScenes.find({ storyId: s._id }).lean();
           return {
             ...s,
             total_scenes: all_scenes.length,
