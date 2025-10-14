@@ -27,8 +27,9 @@ class userController {
     this.getLibrary = this.getLibrary.bind(this);
     this.viewStory = this.viewStory.bind(this);
     this.createReviewOfStory = this.createReviewOfStory.bind(this);
-    // this.getAllStoriesAccordingToFilter =
-    //   this.getAllStoriesAccordingToFilter.bind(this);
+    this.getAllStoriesAccordingToFilter =
+    this.getAllStoriesAccordingToFilter.bind(this);
+    this.getRandomStories = this.getRandomStories.bind(this);
   }
 
   async getMyDetails(req: Request, res: Response) {
@@ -295,6 +296,44 @@ class userController {
       });
     }
   }
+  async getRandomStories(req: Request, res: Response) {
+    let languageCode = (req.headers["language"] as string) || "en";
+    try {
+      let stories = await Story.aggregate([
+        { $match: { status: "published" } },
+        {
+          $sample: { size: 5 },
+        },
+      ]);
+
+      stories = await Promise.all(
+        stories.map(async (story: any) => {
+          let total_scenes = await StoryScenes.countDocuments({
+            storyId: story._id,
+          });
+          let min_minutes_to_read = Number(total_scenes) * 3;
+          return { ...story, total_scenes, min_minutes_to_read };
+        })
+      );
+
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1013,
+        msg: getMessage(1013, languageCode),
+        data: stories,
+      });
+    } catch (error) {
+      console.error("Error in getDashboard of user", error);
+      return ResponseHandler.send(res, {
+        statusCode: 500,
+        status: "error",
+        msgCode: 500,
+        msg: getMessage(500, languageCode),
+        data: null,
+      });
+    }
+  }
   async viewStory(req: Request, res: Response) {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
@@ -448,90 +487,91 @@ class userController {
   //       });
   //     }
   //   }
-async getAllStoriesAccordingToFilter(req: Request, res: Response) {
-  const languageCode = (req.headers["language"] as string) || "en";
+  async getAllStoriesAccordingToFilter(req: Request, res: Response) {
+    const languageCode = (req.headers["language"] as string) || "en";
 
-  try {
-    // 🔍 Get search query
-    const search = (req.query.search as string) || "";
+    try {
+      // 🔍 Get search query
+      const search = (req.query.search as string) || "";
 
-    // 🔢 Parse pagination params
-    let limit = Number(req.query.limit);
-    let page = Number(req.query.page);
+      // 🔢 Parse pagination params
+      let limit = Number(req.query.limit);
+      let page = Number(req.query.page);
 
-    // ✅ Apply defaults if missing or invalid
-    if (!page || page <= 0) page = 1;
-    if (isNaN(limit) || limit < 0) limit = 10; // default 10 if negative or invalid
+      // ✅ Apply defaults if missing or invalid
+      if (!page || page <= 0) page = 1;
+      if (isNaN(limit) || limit < 0) limit = 10; // default 10 if negative or invalid
 
-    const skip = (page - 1) * limit;
+      const skip = (page - 1) * limit;
 
-    // 🗂️ Build filter
-    const filter: any = { status: "published" };
+      // 🗂️ Build filter
+      const filter: any = { status: "published" };
 
-    if (search.trim() !== "") {
-      const regex = new RegExp(search, "i");
-      filter.$or = [
-        { plotSummary: regex },
-        { logline: regex },
-        { positiveMannerTags: { $elemMatch: { $regex: regex } } },
-        { negativeMannerTags: { $elemMatch: { $regex: regex } } },
-      ];
-    }
+      if (search.trim() !== "") {
+        const regex = new RegExp(search, "i");
+        filter.$or = [
+          { plotSummary: regex },
+          { logline: regex },
+          { positiveMannerTags: { $elemMatch: { $regex: regex } } },
+          { negativeMannerTags: { $elemMatch: { $regex: regex } } },
+        ];
+      }
 
-    // 🧮 Total count for pagination
-    const totalCount = await Story.countDocuments(filter);
-    const totalPages = limit > 0 ? Math.ceil(totalCount / limit) : 1;
+      // 🧮 Total count for pagination
+      const totalCount = await Story.countDocuments(filter);
+      const totalPages = limit > 0 ? Math.ceil(totalCount / limit) : 1;
 
-    // 📖 Fetch stories based on limit
-    let stories: any[] = [];
-    if (limit > 0) {
-      stories = await Story.find(filter)
-        .skip(skip)
-        .limit(limit)
-        .sort({ createdAt: -1 })
-        .lean();
+      // 📖 Fetch stories based on limit
+      let stories: any[] = [];
+      if (limit > 0) {
+        stories = await Story.find(filter)
+          .skip(skip)
+          .limit(limit)
+          .sort({ createdAt: -1 })
+          .lean();
 
-      // Add scenes info
-      stories = await Promise.all(
-        stories.map(async (s: any) => {
-          const all_scenes = await StoryScenes.find({ storyId: s._id }).lean();
-          return {
-            ...s,
-            total_scenes: all_scenes.length,
-            min_minutes_to_read: all_scenes.length * 3,
-          };
-        })
-      );
-    }
+        // Add scenes info
+        stories = await Promise.all(
+          stories.map(async (s: any) => {
+            const all_scenes = await StoryScenes.find({
+              storyId: s._id,
+            }).lean();
+            return {
+              ...s,
+              total_scenes: all_scenes.length,
+              min_minutes_to_read: all_scenes.length * 3,
+            };
+          })
+        );
+      }
 
-    // ✅ Send response
-    return ResponseHandler.send(res, {
-      statusCode: 200,
-      status: "success",
-      msgCode: 1034,
-      msg: getMessage(1034, languageCode),
-      data: {
-        stories,
-        pagination: {
-          totalCount,
-          totalPages,
-          currentPage: page,
-          limit,
+      // ✅ Send response
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1034,
+        msg: getMessage(1034, languageCode),
+        data: {
+          stories,
+          pagination: {
+            totalCount,
+            totalPages,
+            currentPage: page,
+            limit,
+          },
         },
-      },
-    });
-  } catch (error) {
-    console.error("Error in getAllStoriesAccordingToFilter:", error);
-    return ResponseHandler.send(res, {
-      statusCode: 500,
-      status: "error",
-      msgCode: 500,
-      msg: getMessage(500, languageCode),
-      data: null,
-    });
+      });
+    } catch (error) {
+      console.error("Error in getAllStoriesAccordingToFilter:", error);
+      return ResponseHandler.send(res, {
+        statusCode: 500,
+        status: "error",
+        msgCode: 500,
+        msg: getMessage(500, languageCode),
+        data: null,
+      });
+    }
   }
-}
-
 }
 
 export default new userController();
