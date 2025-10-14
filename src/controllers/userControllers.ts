@@ -495,14 +495,14 @@ class userController {
       const search = (req.query.search as string) || "";
 
       // 🔢 Parse pagination params
-      let limit = Number(req.query.limit);
-      let page = Number(req.query.page);
+    //   let limit = Number(req.query.limit);
+    //   let page = Number(req.query.page);
 
       // ✅ Apply defaults if missing or invalid
-      if (!page || page <= 0) page = 1;
-      if (isNaN(limit) || limit < 0) limit = 10; // default 10 if negative or invalid
+    //   if (!page || page <= 0) page = 1;
+    //   if (isNaN(limit) || limit < 0) limit = 10; // default 10 if negative or invalid
 
-      const skip = (page - 1) * limit;
+    //   const skip = (page - 1) * limit;
 
       // 🗂️ Build filter
       const filter: any = { status: "published" };
@@ -518,15 +518,13 @@ class userController {
       }
 
       // 🧮 Total count for pagination
-      const totalCount = await Story.countDocuments(filter);
-      const totalPages = limit > 0 ? Math.ceil(totalCount / limit) : 1;
+    //   const totalCount = await Story.countDocuments(filter);
+    //   const totalPages = limit > 0 ? Math.ceil(totalCount / limit) : 1;
 
       // 📖 Fetch stories based on limit
       let stories: any[] = [];
-      if (limit > 0) {
+      
         stories = await Story.find(filter)
-          .skip(skip)
-          .limit(limit)
           .sort({ createdAt: -1 })
           .lean();
 
@@ -543,7 +541,7 @@ class userController {
             };
           })
         );
-      }
+      
 
       // ✅ Send response
       return ResponseHandler.send(res, {
@@ -553,12 +551,6 @@ class userController {
         msg: getMessage(1013, languageCode),
         data: {
           stories,
-          pagination: {
-            totalCount,
-            totalPages,
-            currentPage: page,
-            limit,
-          },
         },
       });
     } catch (error) {
