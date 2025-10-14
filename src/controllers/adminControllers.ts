@@ -220,7 +220,7 @@ class adminController {
     try {
       const admin = (req as any).user;
 
-      const users = await User.find({});
+      const users = await User.find({is_active:false,is_deleted:false}).sort({createdAt:-1});
 
       return ResponseHandler.send(res, {
         statusCode: 200,

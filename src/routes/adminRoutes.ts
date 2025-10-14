@@ -9,7 +9,7 @@ router.post("/me", verifyToken, verifyAdmin, adminControllers.getMyDetails);
 router.put("/change-password", verifyToken, verifyAdmin, adminControllers.changePassword);
 router.put("/update-user-info/:id", verifyToken, verifyAdmin, adminControllers.udpateUserInfoById);
 router.put("/get-user-info/:id", verifyToken, verifyAdmin, adminControllers.getUserInfoById);
-router.put("/get-all-users", verifyToken, verifyAdmin, adminControllers.getAllUsers);
+router.get("/get-all-users", verifyToken, verifyAdmin, adminControllers.getAllUsers);
 router.post("/add-story", verifyToken, verifyAdmin, adminControllers.createStoryWithScenes);
 router.post("/add-story/:id", verifyToken, verifyAdmin, adminControllers.createStoryWithScenes);
 router.post("/add-story", verifyToken, verifyAdmin, adminControllers.createStoryWithScenes);
