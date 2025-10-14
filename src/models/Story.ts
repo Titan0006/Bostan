@@ -15,7 +15,7 @@ const storySchema = new Schema<IStory>( // poster,logo,logline,plotSummary,manne
     status: {
       type: String,
       default: "draft",
-      enum: ["draft", "published"],
+      enum: ["draft", "published","hide"],
       required: false,
     },
     positiveMannerTags: [{ type: String, default: "", required: false }],

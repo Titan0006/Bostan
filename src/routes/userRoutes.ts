@@ -14,6 +14,6 @@ router.get("/get-library",verifyToken,verifyUser,userControllers.getLibrary);
 router.get("/get-story/:id",verifyToken,verifyUser,userControllers.viewStory); // to view story
 router.post("/review-story",verifyToken,verifyUser,userControllers.createReviewOfStory); // to view story
 router.post("/review-story/:id",verifyToken,verifyUser,userControllers.createReviewOfStory); // to view story
-// router.post("/search-page",verifyToken,verifyUser,userControllers.getAllStoriesAccordingToFilter); // to view story
+router.post("/search-page",verifyToken,verifyUser,userControllers.getAllStoriesAccordingToFilter); // to view story
 
 export default router;

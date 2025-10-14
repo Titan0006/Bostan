@@ -215,7 +215,10 @@ class userController {
         "storyId"
       );
 
-      let featured_stories = await Story.find({ is_featured: true })
+      let featured_stories = await Story.find({
+        status: "published",
+        is_featured: true,
+      })
         .sort({
           creatdeAt: -1,
         })
@@ -296,9 +299,9 @@ class userController {
       let userId = (req as any).user.id;
       let storyId = (req as any).params.id;
 
-      let story = await Story.findById(storyId);
+      let story = await Story.findById(storyId).lean();
 
-      if (!story) {
+      if (!story || story.status!='published') {
         return ResponseHandler.send(res, {
           statusCode: 400,
           status: "error",
@@ -310,12 +313,23 @@ class userController {
 
       await StoryView.create({ storyId, userId });
 
+      const getAllScenes = await StoryScenes.find({ storyId: story._id }).lean();
+
+      const total_number_of_reviews = await StoryReview.countDocuments({storyId:story._id}).lean();
+      const total_number_of_readers = await StoryView.countDocuments({storyId:story._id}).lean();
+      const all_reviews = await StoryReview.find({storyId:story._id}).lean();
+      let all_ratings = all_reviews.reduce((sum,a)=>sum+Number(a.rating),0);
+      let sum =Number(all_ratings/total_number_of_reviews);
+      const average_rating = sum>0 ?sum:sum==0?0:null;
+      const min_minutes_to_read = (getAllScenes.length*3);
+      const total_scenes = getAllScenes.length;
+
       return ResponseHandler.send(res, {
         statusCode: 200,
         status: "success",
         msgCode: 1013,
         msg: getMessage(1013, languageCode),
-        data: story,
+        data: { ...story,total_number_of_reviews,total_number_of_readers,average_rating,min_minutes_to_read,total_scenes,scenes:getAllScenes},
       });
     } catch (error) {
       console.error("Error in getDashboard of user", error);
@@ -376,45 +390,45 @@ class userController {
       });
     }
   }
-//   async getAllStoriesAccordingToFilter(req: Request, res: Response) {
-//     let languageCode = (req.headers["language"] as string) || "en";
-//     try {
-//       let search = req.query.search as string; // both mannerTags and search query for title and description will come here
-//       let limit = Number(req.query.limit) || 10;
-//       let page = Number(req.query.page) || 1;
-//       let skip = (page-1)*limit;
-//       let filter: any = {};
+  async getAllStoriesAccordingToFilter(req: Request, res: Response) {
+    let languageCode = (req.headers["language"] as string) || "en";
+    try {
+      let search = req.query.search as string; // both mannerTags and search query for title and description will come here
+      let limit = Number(req.query.limit) || 10;
+      let page = Number(req.query.page) || 1;
+      let skip = (page - 1) * limit;
+      let filter: any = {};
 
-//       if(search && search.trim()!=""){
-//         let regex = new RegExp(search,'i');
-//         filter.$or=[
-//             {plotSummary:regex},
-//             {logline:regex}
-//             {positiveMannerTags:$includes:[regex]},
-//             {negativeMannerTags:$includes:[regex]},
-//         ]
-//       }
+      if (search && search.trim() != "") {
+        let regex = new RegExp(search, "i");
+        filter.$or = [
+          { plotSummary: regex },
+          { logline: regex },
+          { positiveMannerTags: { $elemMatch: { $regex: regex } } },
+          { negativeMannerTags: { $elemMatch: { $regex: regex } } },
+        ];
+      }
 
-//       let stories = await Story.find(filter).skip(skip).limit(limit);
+      let stories = await Story.find(filter).skip(skip).limit(limit);
 
-//       return ResponseHandler.send(res, {
-//         statusCode: 200,
-//         status: "success",
-//         msgCode: 1034,
-//         msg: getMessage(1034, languageCode),
-//         data: null,
-//       });
-//     } catch (error) {
-//       console.error("Error in getDashboard of user", error);
-//       return ResponseHandler.send(res, {
-//         statusCode: 500,
-//         status: "error",
-//         msgCode: 500,
-//         msg: getMessage(500, languageCode),
-//         data: null,
-//       });
-//     }
-//   }
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1034,
+        msg: getMessage(1034, languageCode),
+        data: null,
+      });
+    } catch (error) {
+      console.error("Error in getDashboard of user", error);
+      return ResponseHandler.send(res, {
+        statusCode: 500,
+        status: "error",
+        msgCode: 500,
+        msg: getMessage(500, languageCode),
+        data: null,
+      });
+    }
+  }
 }
 
 export default new userController();
