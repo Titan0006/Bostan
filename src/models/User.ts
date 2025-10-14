@@ -8,7 +8,7 @@ const userSchema = new Schema<IUser>(
     last_name: { type: String, trim: true, required: false },
     email: { type: String, trim: true, required: false },
     password: { type: String, trim: true, required: false },
-    subscription_plan: {
+    subscription_plan: { 
       type: String,
       trim: true,
       required: false,

@@ -25,6 +25,8 @@ class adminController {
         this.deleteStorySceneById = this.deleteStorySceneById.bind(this);
         this.getStorySceneById = this.getStorySceneById.bind(this);
         this.addStoryOfTheWeek = this.addStoryOfTheWeek.bind(this);
+        this.getAllFeaturedStories = this.getAllFeaturedStories.bind(this);
+        this.getAllBannerStories = this.getAllBannerStories.bind(this);
     }
 
     async getMyDetails(req: Request, res: Response) {
@@ -419,6 +421,82 @@ class adminController {
             });
         }
     }
+    async getAllFeaturedStories(req: Request, res: Response) {
+        let languageCode = (req.headers["language"] as string) || "en";
+        try {
+
+            let allFeaturedStories = await Story.find({status:'published',is_featured:true})
+
+            return ResponseHandler.send(res, {
+                statusCode: 200,
+                status: "success",
+                msgCode: 1013, // 
+                msg: getMessage(1013, languageCode),
+                data: allFeaturedStories,
+            });
+        } catch (error) {
+            console.error("Error in getAllmannerTags:", error);
+            return ResponseHandler.send(res, {
+                statusCode: 500,
+                status: "error",
+                msgCode: 500,
+                msg: getMessage(500, languageCode),
+                data: null,
+            });
+        }
+    }
+    async getAllBannerStories(req: Request, res: Response) {
+        let languageCode = (req.headers["language"] as string) || "en";
+        try {
+
+            let allBannerStories = await Story.find({status:'published',banner_story:true})
+
+            return ResponseHandler.send(res, {
+                statusCode: 200,
+                status: "success",
+                msgCode: 1013, // 
+                msg: getMessage(1013, languageCode),
+                data: allBannerStories,
+            });
+        } catch (error) {
+            console.error("Error in getAllmannerTags:", error);
+            return ResponseHandler.send(res, {
+                statusCode: 500,
+                status: "error",
+                msgCode: 500,
+                msg: getMessage(500, languageCode),
+                data: null,
+            });
+        }
+    }
+    // async getAllDashboard(req: Request, res: Response) {
+    //     let languageCode = (req.headers["language"] as string) || "en";
+    //     try {
+            
+    //         let type = req.query.type || "all"; //all,day,month,year,custom
+
+    //         let no_of_users = await User.countDocuments({});
+    //         let no_of_stories = await Story.countDocuments({});
+    //         let no_of_paid_users = await User.countDocuments({subscription_plan:{$ne:"free_trial"}});
+
+    //         return ResponseHandler.send(res, {
+    //             statusCode: 200,
+    //             status: "success",
+    //             msgCode: 1013, // 
+    //             msg: getMessage(1013, languageCode),
+    //             data: allUsersCount
+    //         });
+    //     } catch (error) {
+    //         console.error("Error in getAllmannerTags:", error);
+    //         return ResponseHandler.send(res, {
+    //             statusCode: 500,
+    //             status: "error",
+    //             msgCode: 500,
+    //             msg: getMessage(500, languageCode),
+    //             data: null,
+    //         });
+    //     }
+    // }
     async getAllStories(req: Request, res: Response) {
         let languageCode = (req.headers["language"] as string) || "en";
         try {
