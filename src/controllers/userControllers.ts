@@ -473,9 +473,7 @@ async getAllStoriesAccordingToFilter(req: Request, res: Response) {
           totalCount,
           totalPages,
           currentPage: page,
-          limit,
-          hasNextPage: page < totalPages,
-          hasPrevPage: page > 1,
+          limit
         },
       },
     });
