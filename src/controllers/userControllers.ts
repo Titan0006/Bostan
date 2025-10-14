@@ -549,8 +549,8 @@ class userController {
       return ResponseHandler.send(res, {
         statusCode: 200,
         status: "success",
-        msgCode: 1034,
-        msg: getMessage(1034, languageCode),
+        msgCode: 1013,
+        msg: getMessage(1013, languageCode),
         data: {
           stories,
           pagination: {
