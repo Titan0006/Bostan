@@ -263,7 +263,7 @@ class userController {
   async getLibrary(req: Request, res: Response) {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
-      let all_stories = await Story.find({}).lean().sort({ createdAt: -1 });
+      let all_stories = await Story.find({status:'published'}).lean().sort({ createdAt: -1 });
 
       all_stories = await Promise.all(
         all_stories.map(async (story: any) => {
@@ -390,45 +390,107 @@ class userController {
       });
     }
   }
-  async getAllStoriesAccordingToFilter(req: Request, res: Response) {
-    let languageCode = (req.headers["language"] as string) || "en";
-    try {
-      let search = req.query.search as string; // both mannerTags and search query for title and description will come here
-      let limit = Number(req.query.limit) || 10;
-      let page = Number(req.query.page) || 1;
-      let skip = (page - 1) * limit;
-      let filter: any = {};
+//   async getAllStoriesAccordingToFilter(req: Request, res: Response) {
+//     let languageCode = (req.headers["language"] as string) || "en";
+//     try {
+//       let search = req.query.search as string; // both mannerTags and search query for title and description will come here
+//       let limit = Number(req.query.limit) || 10;
+//       let page = Number(req.query.page) || 1;
+//       let skip = (page - 1) * limit;
+//       let filter: any = {};
 
-      if (search && search.trim() != "") {
-        let regex = new RegExp(search, "i");
-        filter.$or = [
-          { plotSummary: regex },
-          { logline: regex },
-          { positiveMannerTags: { $elemMatch: { $regex: regex } } },
-          { negativeMannerTags: { $elemMatch: { $regex: regex } } },
-        ];
-      }
+//       if (search && search.trim() != "") {
+//         let regex = new RegExp(search, "i");
+//         filter.$or = [
+//           { plotSummary: regex },
+//           { logline: regex },
+//           { positiveMannerTags: { $elemMatch: { $regex: regex } } },
+//           { negativeMannerTags: { $elemMatch: { $regex: regex } } },
+//         ];
+//       }
 
-      let stories = await Story.find(filter).skip(skip).limit(limit);
+//       let stories = await Story.find(filter).skip(skip).limit(limit);
 
-      return ResponseHandler.send(res, {
-        statusCode: 200,
-        status: "success",
-        msgCode: 1034,
-        msg: getMessage(1034, languageCode),
-        data: null,
-      });
-    } catch (error) {
-      console.error("Error in getDashboard of user", error);
-      return ResponseHandler.send(res, {
-        statusCode: 500,
-        status: "error",
-        msgCode: 500,
-        msg: getMessage(500, languageCode),
-        data: null,
-      });
+//       return ResponseHandler.send(res, {
+//         statusCode: 200,
+//         status: "success",
+//         msgCode: 1034,
+//         msg: getMessage(1034, languageCode),
+//         data: stories,
+//       });
+//     } catch (error) {
+//       console.error("Error in getDashboard of user", error);
+//       return ResponseHandler.send(res, {
+//         statusCode: 500,
+//         status: "error",
+//         msgCode: 500,
+//         msg: getMessage(500, languageCode),
+//         data: null,
+//       });
+//     }
+//   }
+async getAllStoriesAccordingToFilter(req: Request, res: Response) {
+  let languageCode = (req.headers["language"] as string) || "en";
+  try {
+    let search = (req.query.search as string) || ""; // both mannerTags and search query for title and description will come here
+    let limit = Number(req.query.limit) || 10;
+    let page = Number(req.query.page) || 1;
+    let skip = (page - 1) * limit;
+    let filter: any = {
+        status:'published'
+    };
+
+    // 🔍 Apply search filters
+    if (search.trim() !== "") {
+      const regex = new RegExp(search, "i");
+      filter.$or = [
+        { plotSummary: regex },
+        { logline: regex },
+        { positiveMannerTags: { $elemMatch: { $regex: regex } } },
+        { negativeMannerTags: { $elemMatch: { $regex: regex } } },
+      ];
     }
+
+    // 🧮 Get total count for pagination
+    const totalCount = await Story.countDocuments(filter);
+    const totalPages = Math.ceil(totalCount / limit);
+
+    // 📖 Fetch paginated stories
+    const stories = await Story.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 }); // optional: sort by latest
+
+    // ✅ Send response with pagination info
+    return ResponseHandler.send(res, {
+      statusCode: 200,
+      status: "success",
+      msgCode: 1034,
+      msg: getMessage(1034, languageCode),
+      data: {
+        stories,
+        pagination: {
+          totalCount,
+          totalPages,
+          currentPage: page,
+          limit,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error in getAllStoriesAccordingToFilter:", error);
+    return ResponseHandler.send(res, {
+      statusCode: 500,
+      status: "error",
+      msgCode: 500,
+      msg: getMessage(500, languageCode),
+      data: null,
+    });
   }
+}
+
 }
 
 export default new userController();
