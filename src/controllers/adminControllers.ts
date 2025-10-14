@@ -236,7 +236,8 @@ class adminController {
     if (search.trim() !== "") {
       const regex = new RegExp(search.trim(), "i"); // case-insensitive regex
       filter.$or = [
-        { name: { $regex: regex } },
+        { first_name: { $regex: regex } },
+        { last_name: { $regex: regex } },
         { email: { $regex: regex } },
       ];
     }
