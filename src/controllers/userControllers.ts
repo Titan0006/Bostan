@@ -29,7 +29,7 @@ class userController {
     this.viewStory = this.viewStory.bind(this);
     this.createReviewOfStory = this.createReviewOfStory.bind(this);
     this.getAllStoriesAccordingToFilter =
-    this.getAllStoriesAccordingToFilter.bind(this);
+      this.getAllStoriesAccordingToFilter.bind(this);
     this.getRandomStories = this.getRandomStories.bind(this);
     this.getAllMyReviews = this.getAllMyReviews.bind(this);
   }
@@ -242,17 +242,16 @@ class userController {
 
       let userId = (req as any).user.id;
 
-      const twentyFourHourAgo = new Date(Date.now()-24*60*60*1000);
+      const twentyFourHourAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
       const recentActivity = await UserActivity.findOne({
-        userId:userId,
-        createdAt:{$gte:twentyFourHourAgo}
-      })
+        userId: userId,
+        createdAt: { $gte: twentyFourHourAgo },
+      });
 
-      if(!recentActivity){
-        await UserActivity.create({userId})
+      if (!recentActivity) {
+        await UserActivity.create({ userId });
       }
 
-      
       return ResponseHandler.send(res, {
         statusCode: 200,
         status: "success",
@@ -510,14 +509,14 @@ class userController {
       const search = (req.query.search as string) || "";
 
       // 🔢 Parse pagination params
-    //   let limit = Number(req.query.limit);
-    //   let page = Number(req.query.page);
+      //   let limit = Number(req.query.limit);
+      //   let page = Number(req.query.page);
 
       // ✅ Apply defaults if missing or invalid
-    //   if (!page || page <= 0) page = 1;
-    //   if (isNaN(limit) || limit < 0) limit = 10; // default 10 if negative or invalid
+      //   if (!page || page <= 0) page = 1;
+      //   if (isNaN(limit) || limit < 0) limit = 10; // default 10 if negative or invalid
 
-    //   const skip = (page - 1) * limit;
+      //   const skip = (page - 1) * limit;
 
       // 🗂️ Build filter
       const filter: any = { status: "published" };
@@ -533,30 +532,27 @@ class userController {
       }
 
       // 🧮 Total count for pagination
-    //   const totalCount = await Story.countDocuments(filter);
-    //   const totalPages = limit > 0 ? Math.ceil(totalCount / limit) : 1;
+      //   const totalCount = await Story.countDocuments(filter);
+      //   const totalPages = limit > 0 ? Math.ceil(totalCount / limit) : 1;
 
       // 📖 Fetch stories based on limit
       let stories: any[] = [];
-      
-        stories = await Story.find(filter)
-          .sort({ createdAt: -1 })
-          .lean();
 
-        // Add scenes info
-        stories = await Promise.all(
-          stories.map(async (s: any) => {
-            const all_scenes = await StoryScenes.find({
-              storyId: s._id,
-            }).lean();
-            return {
-              ...s,
-              total_scenes: all_scenes.length,
-              min_minutes_to_read: all_scenes.length * 3,
-            };
-          })
-        );
-      
+      stories = await Story.find(filter).sort({ createdAt: -1 }).lean();
+
+      // Add scenes info
+      stories = await Promise.all(
+        stories.map(async (s: any) => {
+          const all_scenes = await StoryScenes.find({
+            storyId: s._id,
+          }).lean();
+          return {
+            ...s,
+            total_scenes: all_scenes.length,
+            min_minutes_to_read: all_scenes.length * 3,
+          };
+        })
+      );
 
       // ✅ Send response
       return ResponseHandler.send(res, {
@@ -583,8 +579,19 @@ class userController {
     const languageCode = (req.headers["language"] as string) || "en";
 
     try {
-        let userId = (req as any).user.id;
-        const all_reviews = await StoryReview.find({userId:userId}).populate("storyId");
+      let userId = (req as any).user.id;
+      let all_reviews = await StoryReview.find({ userId: userId })
+        .populate("storyId")
+        .lean();
+
+      all_reviews = await Promise.all(
+        all_reviews.map(async (r: any) => {
+          let no_of_readers = await StoryView.countDocuments({
+            storyId: (r as any).storyId._id,
+          }).lean();
+          return { ...r, no_of_readers };
+        })
+      );
 
       // ✅ Send response
       return ResponseHandler.send(res, {
