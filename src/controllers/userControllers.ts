@@ -263,7 +263,9 @@ class userController {
   async getLibrary(req: Request, res: Response) {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
-      let all_stories = await Story.find({status:'published'}).lean().sort({ createdAt: -1 });
+      let all_stories = await Story.find({ status: "published" })
+        .lean()
+        .sort({ createdAt: -1 });
 
       all_stories = await Promise.all(
         all_stories.map(async (story: any) => {
@@ -301,7 +303,7 @@ class userController {
 
       let story = await Story.findById(storyId).lean();
 
-      if (!story || story.status!='published') {
+      if (!story || story.status != "published") {
         return ResponseHandler.send(res, {
           statusCode: 400,
           status: "error",
@@ -313,15 +315,24 @@ class userController {
 
       await StoryView.create({ storyId, userId });
 
-      const getAllScenes = await StoryScenes.find({ storyId: story._id }).lean();
+      const getAllScenes = await StoryScenes.find({
+        storyId: story._id,
+      }).lean();
 
-      const total_number_of_reviews = await StoryReview.countDocuments({storyId:story._id}).lean();
-      const total_number_of_readers = await StoryView.countDocuments({storyId:story._id}).lean();
-      const all_reviews = await StoryReview.find({storyId:story._id}).lean();
-      let all_ratings = all_reviews.reduce((sum,a)=>sum+Number(a.rating),0);
-      let sum =Number(all_ratings/total_number_of_reviews);
-      const average_rating = sum>0 ?sum:sum==0?0:null;
-      const min_minutes_to_read = (getAllScenes.length*3);
+      const total_number_of_reviews = await StoryReview.countDocuments({
+        storyId: story._id,
+      }).lean();
+      const total_number_of_readers = await StoryView.countDocuments({
+        storyId: story._id,
+      }).lean();
+      const all_reviews = await StoryReview.find({ storyId: story._id }).lean();
+      let all_ratings = all_reviews.reduce(
+        (sum, a) => sum + Number(a.rating),
+        0
+      );
+      let sum = Number(all_ratings / total_number_of_reviews);
+      const average_rating = sum > 0 ? sum : sum == 0 ? 0 : null;
+      const min_minutes_to_read = getAllScenes.length * 3;
       const total_scenes = getAllScenes.length;
 
       return ResponseHandler.send(res, {
@@ -329,7 +340,15 @@ class userController {
         status: "success",
         msgCode: 1013,
         msg: getMessage(1013, languageCode),
-        data: { ...story,total_number_of_reviews,total_number_of_readers,average_rating,min_minutes_to_read,total_scenes,scenes:getAllScenes},
+        data: {
+          ...story,
+          total_number_of_reviews,
+          total_number_of_readers,
+          average_rating,
+          min_minutes_to_read,
+          total_scenes,
+          scenes: getAllScenes,
+        },
       });
     } catch (error) {
       console.error("Error in getDashboard of user", error);
@@ -390,105 +409,115 @@ class userController {
       });
     }
   }
-//   async getAllStoriesAccordingToFilter(req: Request, res: Response) {
-//     let languageCode = (req.headers["language"] as string) || "en";
-//     try {
-//       let search = req.query.search as string; // both mannerTags and search query for title and description will come here
-//       let limit = Number(req.query.limit) || 10;
-//       let page = Number(req.query.page) || 1;
-//       let skip = (page - 1) * limit;
-//       let filter: any = {};
+  //   async getAllStoriesAccordingToFilter(req: Request, res: Response) {
+  //     let languageCode = (req.headers["language"] as string) || "en";
+  //     try {
+  //       let search = req.query.search as string; // both mannerTags and search query for title and description will come here
+  //       let limit = Number(req.query.limit) || 10;
+  //       let page = Number(req.query.page) || 1;
+  //       let skip = (page - 1) * limit;
+  //       let filter: any = {};
 
-//       if (search && search.trim() != "") {
-//         let regex = new RegExp(search, "i");
-//         filter.$or = [
-//           { plotSummary: regex },
-//           { logline: regex },
-//           { positiveMannerTags: { $elemMatch: { $regex: regex } } },
-//           { negativeMannerTags: { $elemMatch: { $regex: regex } } },
-//         ];
-//       }
+  //       if (search && search.trim() != "") {
+  //         let regex = new RegExp(search, "i");
+  //         filter.$or = [
+  //           { plotSummary: regex },
+  //           { logline: regex },
+  //           { positiveMannerTags: { $elemMatch: { $regex: regex } } },
+  //           { negativeMannerTags: { $elemMatch: { $regex: regex } } },
+  //         ];
+  //       }
 
-//       let stories = await Story.find(filter).skip(skip).limit(limit);
+  //       let stories = await Story.find(filter).skip(skip).limit(limit);
 
-//       return ResponseHandler.send(res, {
-//         statusCode: 200,
-//         status: "success",
-//         msgCode: 1034,
-//         msg: getMessage(1034, languageCode),
-//         data: stories,
-//       });
-//     } catch (error) {
-//       console.error("Error in getDashboard of user", error);
-//       return ResponseHandler.send(res, {
-//         statusCode: 500,
-//         status: "error",
-//         msgCode: 500,
-//         msg: getMessage(500, languageCode),
-//         data: null,
-//       });
-//     }
-//   }
-async getAllStoriesAccordingToFilter(req: Request, res: Response) {
-  let languageCode = (req.headers["language"] as string) || "en";
-  try {
-    let search = (req.query.search as string) || ""; // both mannerTags and search query for title and description will come here
-    let limit = Number(req.query.limit) || 10;
-    let page = Number(req.query.page) || 1;
-    let skip = (page - 1) * limit;
-    let filter: any = {
-        status:'published'
-    };
+  //       return ResponseHandler.send(res, {
+  //         statusCode: 200,
+  //         status: "success",
+  //         msgCode: 1034,
+  //         msg: getMessage(1034, languageCode),
+  //         data: stories,
+  //       });
+  //     } catch (error) {
+  //       console.error("Error in getDashboard of user", error);
+  //       return ResponseHandler.send(res, {
+  //         statusCode: 500,
+  //         status: "error",
+  //         msgCode: 500,
+  //         msg: getMessage(500, languageCode),
+  //         data: null,
+  //       });
+  //     }
+  //   }
+  async getAllStoriesAccordingToFilter(req: Request, res: Response) {
+    let languageCode = (req.headers["language"] as string) || "en";
+    try {
+      let search = (req.query.search as string) || ""; // both mannerTags and search query for title and description will come here
+      let limit = Number(req.query.limit) || 10;
+      let page = Number(req.query.page) || 1;
+      let skip = (page - 1) * limit;
+      let filter: any = {
+        status: "published",
+      };
 
-    // 🔍 Apply search filters
-    if (search.trim() !== "") {
-      const regex = new RegExp(search, "i");
-      filter.$or = [
-        { plotSummary: regex },
-        { logline: regex },
-        { positiveMannerTags: { $elemMatch: { $regex: regex } } },
-        { negativeMannerTags: { $elemMatch: { $regex: regex } } },
-      ];
-    }
+      // 🔍 Apply search filters
+      if (search.trim() !== "") {
+        const regex = new RegExp(search, "i");
+        filter.$or = [
+          { plotSummary: regex },
+          { logline: regex },
+          { positiveMannerTags: { $elemMatch: { $regex: regex } } },
+          { negativeMannerTags: { $elemMatch: { $regex: regex } } },
+        ];
+      }
 
-    // 🧮 Get total count for pagination
-    const totalCount = await Story.countDocuments(filter);
-    const totalPages = Math.ceil(totalCount / limit);
+      // 🧮 Get total count for pagination
+      const totalCount = await Story.countDocuments(filter);
+      const totalPages = Math.ceil(totalCount / limit);
 
-    // 📖 Fetch paginated stories
-    const stories = await Story.find(filter)
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 }); // optional: sort by latest
+      // 📖 Fetch paginated stories
+      let stories = await Story.find(filter)
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 }); // optional: sort by latest
 
-    // ✅ Send response with pagination info
-    return ResponseHandler.send(res, {
-      statusCode: 200,
-      status: "success",
-      msgCode: 1034,
-      msg: getMessage(1034, languageCode),
-      data: {
-        stories,
-        pagination: {
-          totalCount,
-          totalPages,
-          currentPage: page,
-          limit
+      stories = await Promise.all(
+        stories.map(async (s:any) => {
+          const all_scenes = await StoryScenes.find({ storyId: s._id });
+          return {
+            ...s,
+            total_scenes: all_scenes.length,
+            min_minutes_to_read: all_scenes.length * 3,
+          };
+        })
+      );
+
+      // ✅ Send response with pagination info
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1034,
+        msg: getMessage(1034, languageCode),
+        data: {
+          stories,
+          pagination: {
+            totalCount,
+            totalPages,
+            currentPage: page,
+            limit,
+          },
         },
-      },
-    });
-  } catch (error) {
-    console.error("Error in getAllStoriesAccordingToFilter:", error);
-    return ResponseHandler.send(res, {
-      statusCode: 500,
-      status: "error",
-      msgCode: 500,
-      msg: getMessage(500, languageCode),
-      data: null,
-    });
+      });
+    } catch (error) {
+      console.error("Error in getAllStoriesAccordingToFilter:", error);
+      return ResponseHandler.send(res, {
+        statusCode: 500,
+        status: "error",
+        msgCode: 500,
+        msg: getMessage(500, languageCode),
+        data: null,
+      });
+    }
   }
-}
-
 }
 
 export default new userController();
