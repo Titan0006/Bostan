@@ -432,8 +432,9 @@ class userController {
       }
 
       let doesEntryExist = await StoryReview.findOne({
-        userId,storyId
-      })
+        userId,
+        storyId,
+      });
 
       if (doesEntryExist) {
         await StoryReview.findByIdAndUpdate(doesEntryExist._id, { rating });
@@ -592,7 +593,7 @@ class userController {
           let no_of_readers = await StoryView.countDocuments({
             storyId: (r as any).storyId._id,
           }).lean();
-          return { ...r, no_of_readers };
+          return { ...r, storyId: { ...r.storyId, no_of_readers } };
         })
       );
 
