@@ -30,6 +30,7 @@ class userController {
     this.getAllStoriesAccordingToFilter =
     this.getAllStoriesAccordingToFilter.bind(this);
     this.getRandomStories = this.getRandomStories.bind(this);
+    this.getAllMyReviews = this.getAllMyReviews.bind(this);
   }
 
   async getMyDetails(req: Request, res: Response) {
@@ -552,6 +553,32 @@ class userController {
         data: {
           stories,
         },
+      });
+    } catch (error) {
+      console.error("Error in getAllStoriesAccordingToFilter:", error);
+      return ResponseHandler.send(res, {
+        statusCode: 500,
+        status: "error",
+        msgCode: 500,
+        msg: getMessage(500, languageCode),
+        data: null,
+      });
+    }
+  }
+  async getAllMyReviews(req: Request, res: Response) {
+    const languageCode = (req.headers["language"] as string) || "en";
+
+    try {
+        let userId = (req as any).user.id;
+        const all_reviews = await StoryReview.find({userId:userId}).populate("storyId");
+
+      // ✅ Send response
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1013,
+        msg: getMessage(1013, languageCode),
+        data: all_reviews,
       });
     } catch (error) {
       console.error("Error in getAllStoriesAccordingToFilter:", error);
