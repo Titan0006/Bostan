@@ -36,6 +36,7 @@ class adminController {
     this.getAllFeaturedStories = this.getAllFeaturedStories.bind(this);
     this.getAllBannerStories = this.getAllBannerStories.bind(this);
     this.getAllUsersCount = this.getAllUsersCount.bind(this);
+    this.getAllUsers = this.getAllUsers.bind(this);
   }
 
   async getMyDetails(req: Request, res: Response) {
@@ -216,30 +217,65 @@ class adminController {
     }
   }
   async getAllUsers(req: Request, res: Response) {
-    let languageCode = (req.headers["language"] as string) || "en";
-    try {
-      const admin = (req as any).user;
+  let languageCode = (req.headers["language"] as string) || "en";
+  try {
+    const admin = (req as any).user;
 
-      const users = await User.find({is_active:true,is_deleted:false}).sort({createdAt:-1});
+    const search = (req.query.search as string) || "";
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
 
-      return ResponseHandler.send(res, {
-        statusCode: 200,
-        status: "success",
-        msgCode: 1013,
-        msg: getMessage(1013, languageCode),
-        data: users,
-      });
-    } catch (error) {
-      console.error("Error in userSignup of AuthController", error);
-      return ResponseHandler.send(res, {
-        statusCode: 500,
-        status: "error",
-        msgCode: 500,
-        msg: getMessage(500, languageCode),
-        data: null,
-      });
+    // Base filter
+    let filter: any = {
+      is_active: true,
+      is_deleted: false,
+    };
+
+    // Add search condition (assuming searching in "name" and "email")
+    if (search.trim() !== "") {
+      const regex = new RegExp(search.trim(), "i"); // case-insensitive regex
+      filter.$or = [
+        { name: { $regex: regex } },
+        { email: { $regex: regex } },
+      ];
     }
+
+    // Get total count for pagination
+    const totalUsers = await User.countDocuments(filter);
+
+    // Fetch paginated and filtered users
+    const users = await User.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // Response with pagination metadata
+    return ResponseHandler.send(res, {
+      statusCode: 200,
+      status: "success",
+      msgCode: 1013,
+      msg: getMessage(1013, languageCode),
+      data: {
+        users,
+        total: totalUsers,
+        page,
+        limit,
+        totalPages: Math.ceil(totalUsers / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Error in getAllUsers of UserController", error);
+    return ResponseHandler.send(res, {
+      statusCode: 500,
+      status: "error",
+      msgCode: 500,
+      msg: getMessage(500, languageCode),
+      data: null,
+    });
   }
+}
+
   async createStoryWithScenes(req: Request, res: Response) {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
