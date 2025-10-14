@@ -419,7 +419,6 @@ class userController {
     try {
       let userId = (req as any).user.id;
       let { storyId, rating } = req.body;
-      let id = req.params.id;
       let story = await Story.findById(storyId);
 
       if (!story) {
@@ -432,8 +431,12 @@ class userController {
         });
       }
 
-      if (id) {
-        await StoryReview.findByIdAndUpdate(id, { rating });
+      let doesEntryExist = await StoryReview.findOne({
+        userId,storyId
+      })
+
+      if (doesEntryExist) {
+        await StoryReview.findByIdAndUpdate(doesEntryExist._id, { rating });
         return ResponseHandler.send(res, {
           statusCode: 200,
           status: "success",

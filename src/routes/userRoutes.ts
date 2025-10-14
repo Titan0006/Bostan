@@ -15,7 +15,7 @@ router.get("/random-stories",verifyToken,verifyUser,userControllers.getRandomSto
 router.get("/get-story/:id",verifyToken,verifyUser,userControllers.viewStory); // to view story
 router.get("/get-all-reviews",verifyToken,verifyUser,userControllers.getAllMyReviews); // to view story
 router.post("/review-story",verifyToken,verifyUser,userControllers.createReviewOfStory); // to view story
-router.post("/review-story/:id",verifyToken,verifyUser,userControllers.createReviewOfStory); // to view story
+// router.post("/review-story/:id",verifyToken,verifyUser,userControllers.createReviewOfStory); // to view story
 router.get("/search-page",verifyToken,verifyUser,userControllers.getAllStoriesAccordingToFilter); // to view story
 
 export default router;
