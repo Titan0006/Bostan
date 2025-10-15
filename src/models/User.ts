@@ -35,7 +35,7 @@ userSchema.pre('save',async function(next){
 })
 
 userSchema.methods.comparePassword = async function (candidatePassword:string){
-  return await bcrypt.compare(candidatePassword,this.Password)
+  return await bcrypt.compare(candidatePassword,this.password)
 }
 
 const User = model<IUser>("User", userSchema, "User");
