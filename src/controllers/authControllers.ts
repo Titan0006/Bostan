@@ -343,7 +343,7 @@ class AuthController {
         status: "success",
         msgCode: 1006,
         msg: getMessage(1006, languageCode),
-        data: { token, email },
+        data: { token, user:{email,full_name:userExists.full_name} },
       });
     } catch (error) {
       console.error("Error in login of AuthController", error);
