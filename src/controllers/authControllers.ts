@@ -144,7 +144,7 @@ class AuthController {
   async verifyEmailOTPForUser(req: Request, res: Response) {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
-      const { first_name, last_name, email, password, otp } = req.body;
+      const { full_name, email, password, otp } = req.body;
 
       const existing_email = await User.findOne({ email: email });
 
@@ -190,8 +190,7 @@ class AuthController {
       let new_user: any = {};
       if (password && password != "") {
         new_user = await User.create({
-          first_name,
-          last_name,
+          full_name,
           password,
           email,
         });
