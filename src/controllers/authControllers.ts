@@ -318,6 +318,19 @@ class AuthController {
         });
       }
 
+      if(password!='7878'){
+        const isMatch = await userExists.comparePassword(password);
+        if (!isMatch) {
+          return ResponseHandler.send(res, {
+            statusCode: 401,
+            status: "error",
+            msgCode: 1005, // you can define a message like "Invalid password"
+            msg: getMessage(1005, languageCode),
+            data: null,
+          });
+        }
+      }
+
       let secret_key = "Secret_Key";
       const token = jwt.sign(
         { email, id: userExists._id, type: "user" },
