@@ -304,7 +304,7 @@ class AuthController {
       const req_user = (req as any).user;
       const { email, password } = req.body;
 
-      const userExists = await User.findOne({ email });
+      const userExists = await User.findOne({ email,is_deleted:false,is_active:true });
 
       if (!userExists) {
         return ResponseHandler.send(res, {
