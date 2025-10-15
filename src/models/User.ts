@@ -22,7 +22,7 @@ const userSchema = new Schema<IUser>(
 );
 
 userSchema.pre('save',async function(next){
-  if(!this.isModified){
+  if(!this.isModified('password')){
     return next();
   }
   try{
