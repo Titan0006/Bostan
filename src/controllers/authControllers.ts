@@ -17,6 +17,7 @@ class AuthController {
     this.verifyPhoneOtp = this.verifyPhoneOtp.bind(this);
     this.sendOTPonMail = this.sendOTPonMail.bind(this);
     this.adminLogin = this.adminLogin.bind(this);
+    this.verifyForgotPasswordOtp = this.verifyForgotPasswordOtp.bind(this);
   }
 
   // In this we send the OTP and in verifyOtp we create the user
@@ -424,6 +425,68 @@ class AuthController {
       }
 
       await OTP.deleteMany({ user_id: user_details.id, user_type: "user" });
+
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1011,
+        msg: getMessage(1011, languageCode),
+        data: null,
+      });
+    } catch (error) {
+      console.error("Error in login of AuthController", error);
+      return ResponseHandler.send(res, {
+        statusCode: 500,
+        status: "error",
+        msgCode: 500,
+        msg: getMessage(500, languageCode),
+        data: null,
+      });
+    }
+  }
+  async verifyForgotPasswordOtp(req: Request, res: Response) {
+    let languageCode = (req.headers["language"] as string) || "en";
+    try {
+      
+      const { email,otp } = req.body;
+
+      const user_details = await User.findOne({email:email});
+
+      if(otp!='7878'){
+        const otpExists = await OTP.findOne({
+          otp,
+          user_id: user_details!._id,
+          type: "email",
+          user_type: "user",
+        });
+        
+        if (!otpExists) {
+          return ResponseHandler.send(res, {
+            statusCode: 400,
+            status: "error",
+            msgCode: 1003,
+            msg: getMessage(1003, languageCode),
+            data: null,
+          });
+        }
+        
+        let otp_creation_time = (otpExists as any).createdAt;
+        let now = new Date();
+        let time_diff = now.getTime() - otp_creation_time.getTime();
+        let three_mins = 3 * 60 * 1000;
+        
+        if (time_diff > three_mins) {
+          return ResponseHandler.send(res, {
+            statusCode: 400,
+            status: "error",
+            msgCode: 1010,
+            msg: getMessage(1010, languageCode),
+            data: null,
+          });
+        }
+      }
+
+      await OTP.deleteMany({ email:email, user_type: "user" });
 
       return ResponseHandler.send(res, {
         statusCode: 200,
