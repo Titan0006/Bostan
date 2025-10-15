@@ -214,8 +214,7 @@ class AuthController {
           token,
           user: {
             email: new_user.email,
-            first_name: new_user.first_name,
-            last_name: new_user.last_name,
+            full_name:full_name
           },
         },
       });
