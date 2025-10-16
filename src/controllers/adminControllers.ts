@@ -302,12 +302,12 @@ class adminController {
         if (trimmedTag) {
           const exists = await MannerTags.findOne({
             tagName: trimmedTag,
-            type: "negative",
+            tagType: "negative",
           });
           if (!exists) {
             await MannerTags.create({
               tagName: trimmedTag,
-              type: "negative",
+              tagType: "negative",
             });
           }
         }
@@ -319,12 +319,12 @@ class adminController {
         if (trimmedTag) {
           const exists = await MannerTags.findOne({
             tagName: trimmedTag,
-            type: "positive",
+            tagType: "positive",
           });
           if (!exists) {
             await MannerTags.create({
               tagName: trimmedTag,
-              type: "positive",
+              tagType: "positive",
             });
           }
         }
@@ -503,19 +503,19 @@ class adminController {
       // negativeMannerTags.forEach(async(m)=>{
       //   await MannerTags.create({
       //     tagName:m,
-      //     type:'negative'
+      //     tagType:'negative'
       //   })
       // })
       // positiveMannerTags.forEach(async(m)=>{
       //   await MannerTags.create({
       //     tagName:m,
-      //     type:'positive'
+      //     tagType:'positive'
       //   })
       // })
       let mannerTags = await MannerTags.find({});
       let positiveMannerTags = mannerTags
         .map((m: any) => {
-          if (m.type == "positive") {
+          if (m.tagType == "positive") {
             return m.tagName;
           }
         })
@@ -523,7 +523,7 @@ class adminController {
 
       let negativeMannerTags = mannerTags
         .map((m: any) => {
-          if (m.type == "negative") {
+          if (m.tagType == "negative") {
             return m.tagName;
           }
         })

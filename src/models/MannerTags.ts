@@ -4,7 +4,7 @@ import { Schema, model } from "mongoose";
 const mannerTagsSchema = new Schema<IMannerTags>(//tagName,category
   {
     tagName: { type: String, trim: true, required: false }, 
-    type: { type: String, trim: true, required: false, default:"negative",enum:["negative","positive"] }
+    tagType: { type: String, trim: true, required: false, default:"negative",enum:["negative","positive"] }
   },
   { timestamps: true }
 );
