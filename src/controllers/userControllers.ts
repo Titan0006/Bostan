@@ -168,102 +168,207 @@ class userController {
   async getDashboard(req: Request, res: Response) {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
-      let banner_stories = await Story.find({
-        status: "published",
-        banner_story: true,
-      })
-        .sort({ createdAt: -1 })
-        .lean();
+      const user = (req as any).user;
 
-      // add other things with banner like total_number_of_reviews, total_number_of_readers,average_rating,min_minutes_to_read,total_scenes
-
-      banner_stories = await Promise.all(
-        banner_stories.map(async (story: any) => {
-          let total_number_of_reviews = await StoryReview.countDocuments({
-            storyId: story._id,
-          });
-          let total_number_of_readers = await StoryView.countDocuments({
-            storyId: story._id,
-          });
-          let total_reviews = await StoryReview.find({
-            storyId: story._id,
-          }).select("rating");
-          console.log("total_reviewsssssssssssssssssssssssssss", total_reviews);
-          let total_rating_of_all_reviews = total_reviews.reduce(
-            (sum: any, arr: any) => sum + Number(arr.rating),
-            0
-          );
-          let average_rating =
-            Number(total_rating_of_all_reviews) / total_reviews.length;
-          let total_scenes = await StoryScenes.countDocuments({
-            storyId: story._id,
-          });
-          let min_minutes_to_read = total_scenes * 3;
-          return {
-            ...story,
-            total_number_of_reviews,
-            total_number_of_readers,
-            average_rating,
-            min_minutes_to_read,
-            total_scenes,
-          };
+      if (user.type == "user") {
+        let banner_stories = await Story.find({
+          status: "published",
+          banner_story: true,
         })
-      );
+          .sort({ createdAt: -1 })
+          .lean();
 
-      let new_stories = await Story.find({ status: "published" })
-        .sort({ createdAt: -1 })
-        .limit(4);
+        // add other things with banner like total_number_of_reviews, total_number_of_readers,average_rating,min_minutes_to_read,total_scenes
 
-      let story_of_the_week = await StoryOfTheWeek.findOne({}).populate(
-        "storyId"
-      );
+        banner_stories = await Promise.all(
+          banner_stories.map(async (story: any) => {
+            let total_number_of_reviews = await StoryReview.countDocuments({
+              storyId: story._id,
+            });
+            let total_number_of_readers = await StoryView.countDocuments({
+              storyId: story._id,
+            });
+            let total_reviews = await StoryReview.find({
+              storyId: story._id,
+            }).select("rating");
+            console.log(
+              "total_reviewsssssssssssssssssssssssssss",
+              total_reviews
+            );
+            let total_rating_of_all_reviews = total_reviews.reduce(
+              (sum: any, arr: any) => sum + Number(arr.rating),
+              0
+            );
+            let average_rating =
+              Number(total_rating_of_all_reviews) / total_reviews.length;
+            let total_scenes = await StoryScenes.countDocuments({
+              storyId: story._id,
+            });
+            let min_minutes_to_read = total_scenes * 3;
+            return {
+              ...story,
+              total_number_of_reviews,
+              total_number_of_readers,
+              average_rating,
+              min_minutes_to_read,
+              total_scenes,
+            };
+          })
+        );
 
-      let featured_stories = await Story.find({
-        status: "published",
-        is_featured: true,
-      })
-        .sort({
-          creatdeAt: -1,
+        let new_stories = await Story.find({ status: "published" })
+          .sort({ createdAt: -1 })
+          .limit(4);
+
+        let story_of_the_week = await StoryOfTheWeek.findOne({}).populate(
+          "storyId"
+        );
+
+        let featured_stories = await Story.find({
+          status: "published",
+          is_featured: true,
         })
-        .lean();
+          .sort({
+            creatdeAt: -1,
+          })
+          .lean();
 
-      featured_stories = await Promise.all(
-        featured_stories.map(async (story: any) => {
-          let all_readers = await StoryView.countDocuments({
-            storyId: story._id,
-          });
-          return {
-            ...story,
-            total_number_of_readers:
-              Number(all_readers) > 0 ? Number(all_readers) : 0,
-          };
+        featured_stories = await Promise.all(
+          featured_stories.map(async (story: any) => {
+            let all_readers = await StoryView.countDocuments({
+              storyId: story._id,
+            });
+            return {
+              ...story,
+              total_number_of_readers:
+                Number(all_readers) > 0 ? Number(all_readers) : 0,
+            };
+          })
+        );
+
+        let userId = (req as any).user.id;
+
+        const twentyFourHourAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const recentActivity = await UserActivity.findOne({
+          userId: userId,
+          createdAt: { $gte: twentyFourHourAgo },
+        });
+
+        if (!recentActivity) {
+          await UserActivity.create({ userId });
+        }
+
+        return ResponseHandler.send(res, {
+          statusCode: 200,
+          status: "success",
+          msgCode: 1013,
+          msg: getMessage(1013, languageCode),
+          data: {
+            banner_stories,
+            new_stories,
+            story_of_the_week,
+            featured_stories,
+          },
+        });
+      } else {
+        let banner_stories = await Story.find({
+          banner_story: true,
         })
-      );
+          .sort({ createdAt: -1 })
+          .lean();
 
-      let userId = (req as any).user.id;
+        // add other things with banner like total_number_of_reviews, total_number_of_readers,average_rating,min_minutes_to_read,total_scenes
 
-      const twentyFourHourAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-      const recentActivity = await UserActivity.findOne({
-        userId: userId,
-        createdAt: { $gte: twentyFourHourAgo },
-      });
+        banner_stories = await Promise.all(
+          banner_stories.map(async (story: any) => {
+            let total_number_of_reviews = await StoryReview.countDocuments({
+              storyId: story._id,
+            });
+            let total_number_of_readers = await StoryView.countDocuments({
+              storyId: story._id,
+            });
+            let total_reviews = await StoryReview.find({
+              storyId: story._id,
+            }).select("rating");
+            console.log(
+              "total_reviewsssssssssssssssssssssssssss",
+              total_reviews
+            );
+            let total_rating_of_all_reviews = total_reviews.reduce(
+              (sum: any, arr: any) => sum + Number(arr.rating),
+              0
+            );
+            let average_rating =
+              Number(total_rating_of_all_reviews) / total_reviews.length;
+            let total_scenes = await StoryScenes.countDocuments({
+              storyId: story._id,
+            });
+            let min_minutes_to_read = total_scenes * 3;
+            return {
+              ...story,
+              total_number_of_reviews,
+              total_number_of_readers,
+              average_rating,
+              min_minutes_to_read,
+              total_scenes,
+            };
+          })
+        );
 
-      if (!recentActivity) {
-        await UserActivity.create({ userId });
+        let new_stories = await Story.find({ status: "published" })
+          .sort({ createdAt: -1 })
+          .limit(4);
+
+        let story_of_the_week = await StoryOfTheWeek.findOne({}).populate(
+          "storyId"
+        );
+
+        let featured_stories = await Story.find({
+          is_featured: true,
+        })
+          .sort({
+            creatdeAt: -1,
+          })
+          .lean();
+
+        featured_stories = await Promise.all(
+          featured_stories.map(async (story: any) => {
+            let all_readers = await StoryView.countDocuments({
+              storyId: story._id,
+            });
+            return {
+              ...story,
+              total_number_of_readers:
+                Number(all_readers) > 0 ? Number(all_readers) : 0,
+            };
+          })
+        );
+
+        let userId = (req as any).user.id;
+
+        const twentyFourHourAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const recentActivity = await UserActivity.findOne({
+          userId: userId,
+          createdAt: { $gte: twentyFourHourAgo },
+        });
+
+        if (!recentActivity) {
+          await UserActivity.create({ userId });
+        }
+
+        return ResponseHandler.send(res, {
+          statusCode: 200,
+          status: "success",
+          msgCode: 1013,
+          msg: getMessage(1013, languageCode),
+          data: {
+            banner_stories,
+            new_stories,
+            story_of_the_week,
+            featured_stories,
+          },
+        });
       }
-
-      return ResponseHandler.send(res, {
-        statusCode: 200,
-        status: "success",
-        msgCode: 1013,
-        msg: getMessage(1013, languageCode),
-        data: {
-          banner_stories,
-          new_stories,
-          story_of_the_week,
-          featured_stories,
-        },
-      });
     } catch (error) {
       console.error("Error in getDashboard of user", error);
       return ResponseHandler.send(res, {
