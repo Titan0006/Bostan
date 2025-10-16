@@ -16,6 +16,7 @@ import { generateOTP } from "../utils/generateOTP.js";
 import jwt from "jsonwebtoken";
 import { negativeMannerTags } from "../helpers/NegativeMannerTags.js";
 import { positiveMannerTags } from "../helpers/PositiveMannerTags.js";
+import MannerTags from "../models/MannerTags.js";
 
 class adminController {
   constructor() {
@@ -217,64 +218,64 @@ class adminController {
     }
   }
   async getAllUsers(req: Request, res: Response) {
-  let languageCode = (req.headers["language"] as string) || "en";
-  try {
-    const admin = (req as any).user;
+    let languageCode = (req.headers["language"] as string) || "en";
+    try {
+      const admin = (req as any).user;
 
-    const search = (req.query.search as string) || "";
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-    const skip = (page - 1) * limit;
+      const search = (req.query.search as string) || "";
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const skip = (page - 1) * limit;
 
-    // Base filter
-    let filter: any = {
-      is_active: true,
-      is_deleted: false,
-    };
+      // Base filter
+      let filter: any = {
+        is_active: true,
+        is_deleted: false,
+      };
 
-    // Add search condition (assuming searching in "name" and "email")
-    if (search.trim() !== "") {
-      const regex = new RegExp(search.trim(), "i"); // case-insensitive regex
-      filter.$or = [
-        { full_name: { $regex: regex } },
-        { email: { $regex: regex } },
-      ];
+      // Add search condition (assuming searching in "name" and "email")
+      if (search.trim() !== "") {
+        const regex = new RegExp(search.trim(), "i"); // case-insensitive regex
+        filter.$or = [
+          { full_name: { $regex: regex } },
+          { email: { $regex: regex } },
+        ];
+      }
+
+      // Get total count for pagination
+      const totalUsers = await User.countDocuments(filter);
+
+      // Fetch paginated and filtered users
+      const users = await User.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      // Response with pagination metadata
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1013,
+        msg: getMessage(1013, languageCode),
+        data: {
+          users,
+          total: totalUsers,
+          page,
+          limit,
+          totalPages: Math.ceil(totalUsers / limit),
+        },
+      });
+    } catch (error) {
+      console.error("Error in getAllUsers of UserController", error);
+      return ResponseHandler.send(res, {
+        statusCode: 500,
+        status: "error",
+        msgCode: 500,
+        msg: getMessage(500, languageCode),
+        data: null,
+      });
     }
-
-    // Get total count for pagination
-    const totalUsers = await User.countDocuments(filter);
-
-    // Fetch paginated and filtered users
-    const users = await User.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    // Response with pagination metadata
-    return ResponseHandler.send(res, {
-      statusCode: 200,
-      status: "success",
-      msgCode: 1013,
-      msg: getMessage(1013, languageCode),
-      data: {
-        users,
-        total: totalUsers,
-        page,
-        limit,
-        totalPages: Math.ceil(totalUsers / limit),
-      },
-    });
-  } catch (error) {
-    console.error("Error in getAllUsers of UserController", error);
-    return ResponseHandler.send(res, {
-      statusCode: 500,
-      status: "error",
-      msgCode: 500,
-      msg: getMessage(500, languageCode),
-      data: null,
-    });
   }
-}
 
   async createStoryWithScenes(req: Request, res: Response) {
     let languageCode = (req.headers["language"] as string) || "en";
@@ -291,6 +292,42 @@ class adminController {
           msg: getMessage(1021, languageCode),
           data: null,
         });
+      }
+      const incomingNegativeTags = story.negativeMannerTags || [];
+      const incomingPositiveTags = story.positiveMannerTags || [];
+
+      // --- NEGATIVE TAGS ---
+      for (const tag of incomingNegativeTags) {
+        const trimmedTag = tag.trim();
+        if (trimmedTag) {
+          const exists = await MannerTags.findOne({
+            tagName: trimmedTag,
+            type: "negative",
+          });
+          if (!exists) {
+            await MannerTags.create({
+              tagName: trimmedTag,
+              type: "negative",
+            });
+          }
+        }
+      }
+
+      // --- POSITIVE TAGS ---
+      for (const tag of incomingPositiveTags) {
+        const trimmedTag = tag.trim();
+        if (trimmedTag) {
+          const exists = await MannerTags.findOne({
+            tagName: trimmedTag,
+            type: "positive",
+          });
+          if (!exists) {
+            await MannerTags.create({
+              tagName: trimmedTag,
+              type: "positive",
+            });
+          }
+        }
       }
 
       if (id) {
@@ -461,14 +498,45 @@ class adminController {
   async getAllMannerTags(req: Request, res: Response) {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
-      let mannerTags = { positiveMannerTags, negativeMannerTags };
+      // let negativeTags = negativeMannerTags;
+      // let positiveTags = positiveMannerTags;
+      // negativeMannerTags.forEach(async(m)=>{
+      //   await MannerTags.create({
+      //     tagName:m,
+      //     type:'negative'
+      //   })
+      // })
+      // positiveMannerTags.forEach(async(m)=>{
+      //   await MannerTags.create({
+      //     tagName:m,
+      //     type:'positive'
+      //   })
+      // })
+      let mannerTags = await MannerTags.find({});
+      let positiveMannerTags = mannerTags
+        .map((m: any) => {
+          if (m.type == "positive") {
+            return m.tagName;
+          }
+        })
+        .filter((m) => m != null);
+
+      let negativeMannerTags = mannerTags
+        .map((m: any) => {
+          if (m.type == "negative") {
+            return m.tagName;
+          }
+        })
+        .filter((m) => m != null);
+
+      let allTags = { positiveMannerTags, negativeMannerTags };
 
       return ResponseHandler.send(res, {
         statusCode: 200,
         status: "success",
         msgCode: 1013, //
         msg: getMessage(1013, languageCode),
-        data: mannerTags,
+        data: allTags,
       });
     } catch (error) {
       console.error("Error in getAllmannerTags:", error);
