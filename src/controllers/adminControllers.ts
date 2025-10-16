@@ -553,7 +553,6 @@ class adminController {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
       let allFeaturedStories = await Story.find({
-        status: "published",
         is_featured: true,
       });
 
@@ -579,7 +578,6 @@ class adminController {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
       let allBannerStories = await Story.find({
-        status: "published",
         banner_story: true,
       });
 
