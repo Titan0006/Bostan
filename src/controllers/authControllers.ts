@@ -214,7 +214,8 @@ class AuthController {
           token,
           user: {
             email: new_user.email,
-            full_name:full_name
+            full_name:full_name,
+            _id:new_user._id
           },
         },
       });
@@ -343,7 +344,7 @@ class AuthController {
         status: "success",
         msgCode: 1006,
         msg: getMessage(1006, languageCode),
-        data: { token, user:{email,full_name:userExists.full_name} },
+        data: { token, user:{email,full_name:userExists.full_name,_id:userExists._id} },
       });
     } catch (error) {
       console.error("Error in login of AuthController", error);
