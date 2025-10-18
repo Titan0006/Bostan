@@ -6,11 +6,15 @@ import {connectDB} from "./config/MongoDB.js"
 import { initiateAdmin } from "./helpers/initiateAdmin.js";
 import cluster from "cluster";
 import os from 'os';
+import cors from 'cors';
+
+
 
 dotenv.config();
 
 const numCPUs = os.cpus().length
 const app = express();
+app.use(cors()); // allow all origins by default
 
 const PORT = parseInt(process.env.PORT || "3000", 10);
 const mongoURI = process.env.mongoURI || "";
