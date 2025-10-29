@@ -14,6 +14,7 @@ const userSchema = new Schema<IUser>(
       default: "free_trial",
       enum: ["free_trial", "monthly", "yearly"],
     },
+    is_guest: { type: Boolean, default: false, required: false },
     is_active: { type: Boolean, default: true, required: false },
     is_deleted: { type: Boolean, default: false, required: false },
   },

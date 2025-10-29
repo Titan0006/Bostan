@@ -6,6 +6,7 @@ import TwilioService from "../helpers/twilioService.js";
 import EmailService from "../helpers/SendMail.js";
 import { generateOTP } from "../utils/generateOTP.js";
 import jwt from "jsonwebtoken";
+import crypto from 'crypto';
 
 class AuthController {
   constructor() {
@@ -19,6 +20,7 @@ class AuthController {
     this.adminLogin = this.adminLogin.bind(this);
     this.verifyForgotPasswordOtp = this.verifyForgotPasswordOtp.bind(this);
     this.changePassword = this.changePassword.bind(this);
+    this.guestLogin = this.guestLogin.bind(this);
   }
 
   // In this we send the OTP and in verifyOtp we create the user
@@ -53,6 +55,54 @@ class AuthController {
         msgCode: 1002,
         msg: getMessage(1002, languageCode),
         data: null,
+      });
+    } catch (error) {
+      console.error("Error in userSignup of AuthController", error);
+      return ResponseHandler.send(res, {
+        statusCode: 500,
+        status: "error",
+        msgCode: 500,
+        msg: getMessage(500, languageCode),
+        data: null,
+      });
+    }
+  }
+
+  async guestLogin(req: Request, res: Response) {
+    let languageCode = (req.headers["language"] as string) || "en";
+    try {
+      // Generate unique guest email
+      const randomSuffix = crypto.randomBytes(4).toString("hex"); // 8-char random string
+      const timestamp = Date.now();
+      const uniqueEmail = `guest_${timestamp}_${randomSuffix}@example.com`;
+
+      const guestUser = await User.create({
+        full_name: "Guest User",
+        email: uniqueEmail, // unique placeholder
+        password: "", // no password
+        is_guest: true,
+      });
+
+      let secret_key = "Secret_Key";
+      let token = jwt.sign(
+        {
+          email: guestUser.email,
+          id: guestUser._id,
+          type: "user",
+          is_guest: true,
+        },
+        secret_key,
+        {
+          expiresIn: "7d",
+        }
+      );
+
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1035,
+        msg: getMessage(1035, languageCode),
+        data: {token},
       });
     } catch (error) {
       console.error("Error in userSignup of AuthController", error);
@@ -196,7 +246,7 @@ class AuthController {
         });
         let secret_key = "Secret_Key";
         token = jwt.sign(
-          { email, id: new_user._id, type: "user" },
+          { email, id: new_user._id, type: "user", is_guest: false },
           secret_key,
           {
             expiresIn: "10y",
@@ -214,8 +264,8 @@ class AuthController {
           token,
           user: {
             email: new_user.email,
-            full_name:full_name,
-            _id:new_user._id
+            full_name: full_name,
+            _id: new_user._id,
           },
         },
       });
@@ -305,7 +355,11 @@ class AuthController {
       const req_user = (req as any).user;
       const { email, password } = req.body;
 
-      const userExists = await User.findOne({ email,is_deleted:false,is_active:true });
+      const userExists = await User.findOne({
+        email,
+        is_deleted: false,
+        is_active: true,
+      });
 
       if (!userExists) {
         return ResponseHandler.send(res, {
@@ -317,7 +371,7 @@ class AuthController {
         });
       }
 
-      if(password!='7878'){
+      if (password != "7878") {
         const isMatch = await userExists.comparePassword(password);
         if (!isMatch) {
           return ResponseHandler.send(res, {
@@ -344,7 +398,10 @@ class AuthController {
         status: "success",
         msgCode: 1006,
         msg: getMessage(1006, languageCode),
-        data: { token, user:{email,full_name:userExists.full_name,_id:userExists._id} },
+        data: {
+          token,
+          user: { email, full_name: userExists.full_name, _id: userExists._id },
+        },
       });
     } catch (error) {
       console.error("Error in login of AuthController", error);

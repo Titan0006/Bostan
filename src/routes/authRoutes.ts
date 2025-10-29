@@ -5,6 +5,7 @@ import verifyUser from "../utils/verifyUser.js";
 const router = Router();
 
 router.post("/user/signup",authControllers.userSignup);
+router.post("/user/guest-login",authControllers.guestLogin);
 router.post("/user/verify-otp",authControllers.verifyEmailOTPForUser);
 router.post("/admin/verify-otp",authControllers.verifyEmailOTPForAdmin);
 router.post("/user/login",authControllers.userLogin);

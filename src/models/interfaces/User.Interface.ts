@@ -8,5 +8,6 @@ export interface IUser {
   subscription_plan:string;
   is_active:boolean;
   is_deleted:boolean;
+  is_guest:boolean;
   comparePassword(candidatePassword:string):Promise<boolean>;
 }
