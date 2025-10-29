@@ -102,7 +102,7 @@ class AuthController {
         status: "success",
         msgCode: 1035,
         msg: getMessage(1035, languageCode),
-        data: {token},
+        data: {token,is_guest:true},
       });
     } catch (error) {
       console.error("Error in userSignup of AuthController", error);

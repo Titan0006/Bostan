@@ -21,6 +21,7 @@ router.get("/get-all-users-count", adminControllers.getAllUsersCount);
 router.get("/get-all-featured-stories", adminControllers.getAllFeaturedStories);
 router.get("/get-all-banner-stories", adminControllers.getAllBannerStories);
 router.get("/get-all-stories", verifyToken, verifyAdmin, adminControllers.getAllStories);
+router.get("/get-all-published-stories", verifyToken, verifyAdmin, adminControllers.getAllPublishedStories);
 router.get("/get-story/:id", verifyToken, verifyAdmin, adminControllers.getStoryById);
 router.get("/get-story-scene/:id", verifyToken, verifyAdmin, adminControllers.getStorySceneById);
 router.get("/get-story-scene/:id", verifyToken, verifyAdmin, adminControllers.getStorySceneById);

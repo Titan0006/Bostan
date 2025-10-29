@@ -37,7 +37,7 @@ class adminController {
     this.getAllFeaturedStories = this.getAllFeaturedStories.bind(this);
     this.getAllBannerStories = this.getAllBannerStories.bind(this);
     this.getAllUsersCount = this.getAllUsersCount.bind(this);
-    this.getAllUsers = this.getAllUsers.bind(this);
+    this.getAllPublishedStories = this.getAllPublishedStories.bind(this);
   }
 
   async getMyDetails(req: Request, res: Response) {
@@ -739,6 +739,51 @@ class adminController {
             limit,
             totalPages: Math.ceil(totalStories / limit),
           },
+        },
+      });
+    } catch (error) {
+      console.error("Error in getAllmannerTags:", error);
+      return ResponseHandler.send(res, {
+        statusCode: 500,
+        status: "error",
+        msgCode: 500,
+        msg: getMessage(500, languageCode),
+        data: null,
+      });
+    }
+  }
+  async getAllPublishedStories(req: Request, res: Response) {
+    let languageCode = (req.headers["language"] as string) || "en";
+    try {
+      let search = (req.query.search as string) || "";
+
+      let filters: any = {status:'published'};
+
+      if (search && search.trim() != "") {
+        const regex = new RegExp(search.trim(), "i");
+        filters.$or = [{ title: regex }];
+      }
+
+      let stories = await Story.find(filters)
+        .sort({ createdAt: -1 })
+        .lean();
+
+      stories = await Promise.all(
+        stories.map(async (story: any) => {
+          const sceneCount = await StoryScenes.countDocuments({
+            storyId: story._id,
+          });
+          return { ...story, total_scenes: sceneCount };
+        })
+      );
+      const totalStories = await Story.countDocuments(filters);
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1013, 
+        msg: getMessage(1013, languageCode),
+        data: {
+          stories,
         },
       });
     } catch (error) {
