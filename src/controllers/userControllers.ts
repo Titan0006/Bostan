@@ -204,7 +204,7 @@ class userController {
             let total_scenes = await StoryScenes.countDocuments({
               storyId: story._id,
             });
-            let min_minutes_to_read = total_scenes * 3;
+            let min_minutes_to_read = Math.ceil(total_scenes/3);
             return {
               ...story,
               total_number_of_reviews,
@@ -303,7 +303,7 @@ class userController {
             let total_scenes = await StoryScenes.countDocuments({
               storyId: story._id,
             });
-            let min_minutes_to_read = total_scenes * 3;
+            let min_minutes_to_read = Math.ceil(total_scenes/3);
             return {
               ...story,
               total_number_of_reviews,
@@ -392,7 +392,7 @@ class userController {
           let total_scenes = await StoryScenes.countDocuments({
             storyId: story._id,
           });
-          let min_minutes_to_read = Number(total_scenes) * 3;
+          let min_minutes_to_read = Math.ceil(total_scenes/3);
           return { ...story, total_scenes, min_minutes_to_read };
         })
       );
@@ -430,7 +430,7 @@ class userController {
           let total_scenes = await StoryScenes.countDocuments({
             storyId: story._id,
           });
-          let min_minutes_to_read = Number(total_scenes) * 3;
+          let min_minutes_to_read = Math.ceil(Number(total_scenes)/3);
           return { ...story, total_scenes, min_minutes_to_read };
         })
       );
@@ -490,7 +490,7 @@ class userController {
       );
       let sum = Number(all_ratings / total_number_of_reviews);
       const average_rating = sum > 0 ? sum : sum == 0 ? 0 : null;
-      const min_minutes_to_read = getAllScenes.length * 3;
+      const min_minutes_to_read = Math.ceil(getAllScenes.length/3);
       const total_scenes = getAllScenes.length;
 
       return ResponseHandler.send(res, {
@@ -658,7 +658,7 @@ class userController {
           return {
             ...s,
             total_scenes: all_scenes.length,
-            min_minutes_to_read: all_scenes.length * 3,
+            min_minutes_to_read: Math.ceil(all_scenes.length/3),
           };
         })
       );
