@@ -633,6 +633,7 @@ class userController {
       if (search.trim() !== "") {
         const regex = new RegExp(search, "i");
         filter.$or = [
+          {title:regex},
           { plotSummary: regex },
           { logline: regex },
           { positiveMannerTags: { $elemMatch: { $regex: regex } } },
