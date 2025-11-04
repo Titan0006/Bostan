@@ -226,6 +226,7 @@ class adminController {
       let filter: any = {
         is_active: true,
         is_deleted: false,
+        is_guest:false
       };
 
       // Add search condition (assuming searching in "name" and "email")

@@ -19,6 +19,26 @@ async function verifyUser(req: Request, res: Response, next: NextFunction) {
                 data: null,
             });
         }
+
+        if (!userExists.is_active) {
+            return ResponseHandler.send(res, {
+                statusCode: 401,
+                status: "error",
+                msgCode: 1037,
+                msg: getMessage(1037, languageCode),
+                data: null,
+            });
+        }
+
+        if (userExists.is_deleted) {
+            return ResponseHandler.send(res, {
+                statusCode: 401,
+                status: "error",
+                msgCode: 1036,
+                msg: getMessage(1036, languageCode),
+                data: null,
+            });
+        }
         next()
     } catch (error) {
         return ResponseHandler.send(res, {
