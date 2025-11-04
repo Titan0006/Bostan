@@ -6,7 +6,7 @@
 // import { initiateAdmin } from "./helpers/initiateAdmin.js";
 // import cluster from "cluster";
 // import os from 'os';
-// import cors from 'cors';
+
 
 
 
@@ -62,7 +62,7 @@ import routes from './routes/index.js';
 import morgan from "morgan";
 import {connectDB} from "./config/MongoDB.js"
 import { initiateAdmin } from "./helpers/initiateAdmin.js";
-
+import cors from 'cors';
 dotenv.config();
 
 const app = express();
@@ -70,6 +70,7 @@ const app = express();
 const PORT = parseInt(process.env.PORT || "3000", 10);
 const mongoURI = process.env.mongoURI || "";
 initiateAdmin()
+app.use(cors()); 
 connectDB(mongoURI).then(()=>{
     console.log("mongggooooooooooooooooooooooooooooooooooooooooooooooo",mongoURI)
     app.use(morgan("dev"));
