@@ -153,12 +153,7 @@ class adminController {
           data: null,
         });
       }
-
-      if (
-        (body.isDelete && body.isDelete === true) ||
-        body.isActive === false
-      ) {
-      }
+      console.log('bpdyyyyyyyyyyyyyyyyyyyyyyyyy',body);
       const updated_user = await User.findByIdAndUpdate(id, body, {
         new: true,
       });

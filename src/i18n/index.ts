@@ -8,6 +8,7 @@ function getLanguage(lan="en"){
     //     return en as LanguageFile;
     // }
     return ar as LanguageFile; // default is arabic 
+    // return en as LanguageFile; // default is arabic 
 }
 
 export default function getMessage(code:number,lan="en"){
