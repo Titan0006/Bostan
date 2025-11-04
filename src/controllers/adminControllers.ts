@@ -224,7 +224,6 @@ class adminController {
 
       // Base filter
       let filter: any = {
-        is_deleted: false,
         is_guest:false
       };
 
