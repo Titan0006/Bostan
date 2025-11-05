@@ -67,17 +67,36 @@ class userController {
       const user = (req as any).user;
       const body = req.body;
 
-      let user_details = await User.findByIdAndUpdate(user.id, body, {
-        new: true,
-      });
+      if (body.is_deleted!='' && body.is_deleted==true) {
+        await Promise.all([
+          OTP.deleteMany({user_id:user.id}),
+          StoryReview.deleteMany({user_id:user.id}),
+          StoryView.deleteMany({user_id:user.id}),
+          UserActivity.deleteMany({user_id:user.id}),
+        ])
 
-      return ResponseHandler.send(res, {
-        statusCode: 200,
-        status: "success",
-        msgCode: 1014,
-        msg: getMessage(1014, languageCode),
-        data: user_details,
-      });
+        let user_details = await User.findByIdAndDelete(user.id);
+
+        return ResponseHandler.send(res, {
+          statusCode: 200,
+          status: "success",
+          msgCode: 1029,
+          msg: getMessage(1029, languageCode),
+          data: user_details,
+        });
+      } else {
+        let user_details = await User.findByIdAndUpdate(user.id, body, {
+          new: true,
+        });
+
+        return ResponseHandler.send(res, {
+          statusCode: 200,
+          status: "success",
+          msgCode: 1014,
+          msg: getMessage(1014, languageCode),
+          data: user_details,
+        });
+      }
     } catch (error) {
       console.error("Error in userSignup of AuthController", error);
       return ResponseHandler.send(res, {
@@ -204,7 +223,7 @@ class userController {
             let total_scenes = await StoryScenes.countDocuments({
               storyId: story._id,
             });
-            let min_minutes_to_read = Math.ceil(total_scenes/3);
+            let min_minutes_to_read = Math.ceil(total_scenes / 3);
             return {
               ...story,
               total_number_of_reviews,
@@ -303,7 +322,7 @@ class userController {
             let total_scenes = await StoryScenes.countDocuments({
               storyId: story._id,
             });
-            let min_minutes_to_read = Math.ceil(total_scenes/3);
+            let min_minutes_to_read = Math.ceil(total_scenes / 3);
             return {
               ...story,
               total_number_of_reviews,
@@ -392,7 +411,7 @@ class userController {
           let total_scenes = await StoryScenes.countDocuments({
             storyId: story._id,
           });
-          let min_minutes_to_read = Math.ceil(total_scenes/3);
+          let min_minutes_to_read = Math.ceil(total_scenes / 3);
           return { ...story, total_scenes, min_minutes_to_read };
         })
       );
@@ -430,7 +449,7 @@ class userController {
           let total_scenes = await StoryScenes.countDocuments({
             storyId: story._id,
           });
-          let min_minutes_to_read = Math.ceil(Number(total_scenes)/3);
+          let min_minutes_to_read = Math.ceil(Number(total_scenes) / 3);
           return { ...story, total_scenes, min_minutes_to_read };
         })
       );
@@ -490,7 +509,7 @@ class userController {
       );
       let sum = Number(all_ratings / total_number_of_reviews);
       const average_rating = sum > 0 ? sum : sum == 0 ? 0 : null;
-      const min_minutes_to_read = Math.ceil(getAllScenes.length/3);
+      const min_minutes_to_read = Math.ceil(getAllScenes.length / 3);
       const total_scenes = getAllScenes.length;
 
       return ResponseHandler.send(res, {
@@ -633,7 +652,7 @@ class userController {
       if (search.trim() !== "") {
         const regex = new RegExp(search, "i");
         filter.$or = [
-          {title:regex}, 
+          { title: regex },
           { plotSummary: regex },
           { logline: regex },
           { positiveMannerTags: { $elemMatch: { $regex: regex } } },
@@ -659,7 +678,7 @@ class userController {
           return {
             ...s,
             total_scenes: all_scenes.length,
-            min_minutes_to_read: Math.ceil(all_scenes.length/3),
+            min_minutes_to_read: Math.ceil(all_scenes.length / 3),
           };
         })
       );
