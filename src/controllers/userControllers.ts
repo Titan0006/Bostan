@@ -67,13 +67,13 @@ class userController {
       const user = (req as any).user;
       const body = req.body;
 
-      if (body.is_deleted!='' && body.is_deleted==true) {
+      if (body.is_deleted != "" && body.is_deleted == true) {
         await Promise.all([
-          OTP.deleteMany({user_id:user.id}),
-          StoryReview.deleteMany({user_id:user.id}),
-          StoryView.deleteMany({user_id:user.id}),
-          UserActivity.deleteMany({user_id:user.id}),
-        ])
+          OTP.deleteMany({ user_id: user.id }),
+          StoryReview.deleteMany({ user_id: user.id }),
+          StoryView.deleteMany({ user_id: user.id }),
+          UserActivity.deleteMany({ user_id: user.id }),
+        ]);
 
         let user_details = await User.findByIdAndDelete(user.id);
 
@@ -252,18 +252,59 @@ class userController {
           })
           .lean();
 
-        featured_stories = await Promise.all(
-          featured_stories.map(async (story: any) => {
-            let all_readers = await StoryView.countDocuments({
-              storyId: story._id,
+        if (featured_stories.length <= 0) {
+          let all_story_views = await StoryView.find({}).lean();
+
+          // Step 1: Create a view count hashmap
+          let hashmap = new Map();
+
+          if (all_story_views.length > 0) {
+            all_story_views.forEach((m) => {
+              const storyId = String(m.storyId || m._id); // adjust key field
+              hashmap.set(storyId, (hashmap.get(storyId) || 0) + 1);
             });
-            return {
+          }
+
+          // Step 2: Convert map to array for sorting
+          let storyViewArray = Array.from(hashmap.entries());
+          // [[storyId, count], [storyId, count], ...]
+
+          if (storyViewArray.length > 0) {
+            // Step 3: Sort by views (descending)
+            storyViewArray.sort((a, b) => b[1] - a[1]);
+
+            // Step 4: Get top N (e.g., top 10)
+            const topStoryIds = storyViewArray
+              .slice(0, 10)
+              .map(([storyId]) => storyId);
+
+            // Step 5: Fetch those stories from DB
+            featured_stories = await Story.find({
+              _id: { $in: topStoryIds },
+            }).lean();
+
+            // Step 6: Attach view counts
+            featured_stories = featured_stories.map((story) => ({
               ...story,
-              total_number_of_readers:
-                Number(all_readers) > 0 ? Number(all_readers) : 0,
-            };
-          })
-        );
+              total_number_of_readers: hashmap.get(String(story._id)) || 0,
+            }));
+
+            console.log("Top viewed stories:", featured_stories);
+          }
+        } else {
+          featured_stories = await Promise.all(
+            featured_stories.map(async (story: any) => {
+              let all_readers = await StoryView.countDocuments({
+                storyId: story._id,
+              });
+              return {
+                ...story,
+                total_number_of_readers:
+                  Number(all_readers) > 0 ? Number(all_readers) : 0,
+              };
+            })
+          );
+        }
 
         let userId = (req as any).user.id;
 
