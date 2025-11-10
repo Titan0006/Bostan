@@ -503,7 +503,7 @@ class adminController {
         status: "success",
         msgCode: 1042,
         msg: getMessage(1042, languageCode),
-        data: story_of_the_week[0].storyId,
+        data: {...story_of_the_week[0].storyId,isStoryOfWeek:true},
       });
     } catch (error) {
       console.error("Error in createStoryWithScenes:", error);
@@ -628,7 +628,7 @@ class adminController {
       let startDate: Date | null = null;
       let endDate: Date | null = null;
 
-      // 🕒 Determine date range based on type
+      //  Determine date range based on type
       const now = new Date();
 
       if (type === "day") {

@@ -619,6 +619,14 @@ class userController {
       const average_rating = sum > 0 ? sum : sum == 0 ? 0 : null;
       const min_minutes_to_read = Math.ceil(getAllScenes.length / 3);
       const total_scenes = getAllScenes.length;
+      let story_of_the_week = await StoryOfTheWeek.findOne({});
+
+      let isStoryOfWeek = false;
+      if(story_of_the_week){
+        if((story_of_the_week as any).storyId.toString()===story._id.toString()){
+          isStoryOfWeek = true;
+        }
+      }
 
       return ResponseHandler.send(res, {
         statusCode: 200,
@@ -627,6 +635,7 @@ class userController {
         msg: getMessage(1013, languageCode),
         data: {
           ...story,
+          isStoryOfWeek,
           total_number_of_reviews,
           total_number_of_readers,
           average_rating,

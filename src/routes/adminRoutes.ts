@@ -12,7 +12,6 @@ router.put("/get-user-info/:id", verifyToken, verifyAdmin, adminControllers.getU
 router.get("/get-all-users", verifyToken, verifyAdmin, adminControllers.getAllUsers);
 router.post("/add-story", verifyToken, verifyAdmin, adminControllers.createStoryWithScenes);
 router.post("/add-story/:id", verifyToken, verifyAdmin, adminControllers.createStoryWithScenes);
-router.post("/add-story", verifyToken, verifyAdmin, adminControllers.createStoryWithScenes);
 router.post("/story-of-the-week", verifyToken, verifyAdmin, adminControllers.addStoryOfTheWeek);
 router.get("/get-story-of-the-week", verifyToken, verifyAdmin, adminControllers.getStoryOfTheWeek);
 router.post("/add-story-scene", verifyToken, verifyAdmin, adminControllers.createStoryScenes);
