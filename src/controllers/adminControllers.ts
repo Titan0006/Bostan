@@ -38,6 +38,7 @@ class adminController {
     this.getAllBannerStories = this.getAllBannerStories.bind(this);
     this.getAllUsersCount = this.getAllUsersCount.bind(this);
     this.getAllPublishedStories = this.getAllPublishedStories.bind(this);
+    this.getStoryOfTheWeek = this.getStoryOfTheWeek.bind(this);
   }
 
   async getMyDetails(req: Request, res: Response) {
@@ -477,6 +478,30 @@ class adminController {
         msgCode: 1032,
         msg: getMessage(1032, languageCode),
         data: null,
+      });
+    } catch (error) {
+      console.error("Error in createStoryWithScenes:", error);
+      return ResponseHandler.send(res, {
+        statusCode: 500,
+        status: "error",
+        msgCode: 500,
+        msg: getMessage(500, languageCode),
+        data: null,
+      });
+    }
+  }
+  async getStoryOfTheWeek(req: Request, res: Response) {
+    let languageCode = (req.headers["language"] as string) || "en";
+    try {
+
+      let story_of_the_week = await StoryOfTheWeek.find().populate('storyId');
+
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1042,
+        msg: getMessage(1042, languageCode),
+        data: story_of_the_week[0].storyId,
       });
     } catch (error) {
       console.error("Error in createStoryWithScenes:", error);
