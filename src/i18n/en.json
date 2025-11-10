@@ -37,5 +37,9 @@
     "1034":"Rating updated successfully",
     "1035":"Guest login successfull",
     "1036":"Your account has been deleted . Please contact support",
-    "1037":"Your account has been deactivated . Please contact support"
+    "1037":"Your account has been deactivated . Please contact support",
+    "1038":"Please send both current password and new password",
+    "1039":"You cannot use existing password",
+    "1040":"Please send valid old password",
+    "1041":"Password resetted successfully"
 }

@@ -32,6 +32,7 @@ class userController {
       this.getAllStoriesAccordingToFilter.bind(this);
     this.getRandomStories = this.getRandomStories.bind(this);
     this.getAllMyReviews = this.getAllMyReviews.bind(this);
+    this.resetPassword = this.resetPassword.bind(this);
   }
 
   async getMyDetails(req: Request, res: Response) {
@@ -134,6 +135,72 @@ class userController {
         status: "success",
         msgCode: 1015,
         msg: getMessage(1015, languageCode),
+        data: null,
+      });
+    } catch (error) {
+      console.error("Error in userSignup of AuthController", error);
+      return ResponseHandler.send(res, {
+        statusCode: 500,
+        status: "error",
+        msgCode: 500,
+        msg: getMessage(500, languageCode),
+        data: null,
+      });
+    }
+  }
+  async resetPassword(req: Request, res: Response) {
+    let languageCode = (req.headers["language"] as string) || "en";
+    try {
+      const user = (req as any).user;
+      console.log("userrrrrrrrrrrrrrr",user)
+      const { current_password, new_password } = req.body;
+      console.log("bodyyyyyyyyyyyyy",req.body)
+      
+      if (
+        !current_password ||
+        !new_password ||
+        current_password.trim() === "" ||
+        new_password.trim() === ""
+      ) {
+        return ResponseHandler.send(res, {
+          statusCode: 400,
+          status: "error",
+          msgCode: 1038,
+          msg: getMessage(1038, languageCode),
+          data: null,
+        });
+      }
+
+      if (current_password === new_password) {
+        return ResponseHandler.send(res, {
+          statusCode: 400,
+          status: "error",
+          msgCode: 1039,
+          msg: getMessage(1039, languageCode),
+          data: null,
+        });
+      }
+
+      let existing_user = await User.findOne({ _id: user.id });
+      let response = await existing_user?.comparePassword(current_password);
+      console.log('responseeeeeeeeeeeeeeeee',response)
+      if (!response) {
+        return ResponseHandler.send(res, {
+          statusCode: 400,
+          status: "error",
+          msgCode: 1040,
+          msg: getMessage(1040, languageCode),
+          data: null,
+        });
+      }
+      existing_user!.password = new_password;
+      existing_user?.save();
+
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1041,
+        msg: getMessage(1041, languageCode),
         data: null,
       });
     } catch (error) {
