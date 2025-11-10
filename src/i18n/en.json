@@ -42,5 +42,6 @@
     "1039":"You cannot use existing password",
     "1040":"Please send valid old password",
     "1041":"Password resetted successfully",
-    "1042":"Data fetched successfully"
+    "1042":"Data fetched successfully",
+    "1043":"Removed story of the week successfully"
 }

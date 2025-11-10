@@ -28,5 +28,6 @@ router.get("/get-story-scene/:id", verifyToken, verifyAdmin, adminControllers.ge
 router.post("/delete-story/:id", verifyToken, verifyAdmin, adminControllers.deleteStoryById);
 router.post("/delete-story-scene/:id", verifyToken, verifyAdmin, adminControllers.deleteStorySceneById);
 router.get("/get-all-story-scenes/:id", verifyToken, verifyAdmin, adminControllers.getAllStoryScenes);
+router.post("/remove-story-of-the-week",verifyToken,verifyAdmin,adminControllers.removeStoryOfTheWeek);
 
 export default router;

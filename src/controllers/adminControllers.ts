@@ -41,6 +41,7 @@ class adminController {
     this.getAllUsersCount = this.getAllUsersCount.bind(this);
     this.getAllPublishedStories = this.getAllPublishedStories.bind(this);
     this.getStoryOfTheWeek = this.getStoryOfTheWeek.bind(this);
+    this.removeStoryOfTheWeek = this.removeStoryOfTheWeek.bind(this);
   }
 
   async getMyDetails(req: Request, res: Response) {
@@ -832,6 +833,30 @@ class adminController {
         msgCode: 1013, //
         msg: getMessage(1013, languageCode),
         data: allScenes,
+      });
+    } catch (error) {
+      console.error("Error in getAllmannerTags:", error);
+      return ResponseHandler.send(res, {
+        statusCode: 500,
+        status: "error",
+        msgCode: 500,
+        msg: getMessage(500, languageCode),
+        data: null,
+      });
+    }
+  }
+  async removeStoryOfTheWeek(req: Request, res: Response) {
+    let languageCode = (req.headers["language"] as string) || "en";
+    try {
+    
+      await StoryOfTheWeek.deleteMany({});
+
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1013, //
+        msg: getMessage(1013, languageCode),
+        data: null,
       });
     } catch (error) {
       console.error("Error in getAllmannerTags:", error);
