@@ -497,7 +497,7 @@ class adminController {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
 
-      let story_of_the_week = await StoryOfTheWeek.find().populate('storyId');
+      let story_of_the_week = await StoryOfTheWeek.find().populate('storyId').lean();
 
       return ResponseHandler.send(res, {
         statusCode: 200,
