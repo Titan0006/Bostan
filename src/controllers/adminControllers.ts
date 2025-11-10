@@ -7,6 +7,8 @@ import {
   StoryScenes,
   StoryOfTheWeek,
   UserActivity,
+  StoryReview,
+  StoryView,
 } from "../models/index.js";
 import ResponseHandler from "../utils/responseHandler.js";
 import getMessage from "../i18n/index.js";
@@ -930,11 +932,13 @@ class adminController {
       }
 
       await StoryScenes.deleteMany({ storyId: id });
+      await StoryReview.deleteMany({storyId:id});
+      await StoryView.deleteMany({storyId:id});
 
       return ResponseHandler.send(res, {
         statusCode: 200,
         status: "success",
-        msgCode: 1029, //
+        msgCode: 1029,
         msg: getMessage(1029, languageCode),
         data: story,
       });

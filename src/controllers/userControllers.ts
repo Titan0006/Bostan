@@ -821,6 +821,9 @@ class userController {
         .populate("storyId")
         .lean();
 
+      console.log("all_reviewsssssssssssssssssssssssssssssssssssss",all_reviews)
+      all_reviews = all_reviews.filter((entry:any)=>entry.storyId && entry.storyId._id)
+
       all_reviews = await Promise.all(
         all_reviews.map(async (r: any) => {
           let no_of_readers = await StoryView.countDocuments({
