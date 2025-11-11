@@ -754,6 +754,7 @@ class userController {
 
     try {
       // 🔍 Get search query
+      
       const search = (req.query.search as string) || "";
 
       // 🔢 Parse pagination params
@@ -770,11 +771,10 @@ class userController {
       const filter: any = { status: "published" };
 
       if (search.trim() !== "") {
-        const regex = new RegExp(search, "i");
+        const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const regex = new RegExp(escaped, "i");
         filter.$or = [
           { title: regex },
-          { plotSummary: regex },
-          { logline: regex },
           { positiveMannerTags: { $elemMatch: { $regex: regex } } },
           { negativeMannerTags: { $elemMatch: { $regex: regex } } },
         ];
