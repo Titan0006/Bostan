@@ -20,6 +20,7 @@ const storySchema = new Schema<IStory>( // poster,logo,logline,plotSummary,manne
     },
     positiveMannerTags: [{ type: String, default: "", required: false }],
     negativeMannerTags: [{ type: String, default: "", required: false }],
+    published_date:{type:Date,default:null,required:false}
   },
   { timestamps: true }
 );

@@ -14,4 +14,5 @@ export interface IStory {
   negativeMannerTags:string[],
   is_featured:boolean,
   banner_story:boolean
+  published_date:Date;
 } 

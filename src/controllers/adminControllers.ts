@@ -279,7 +279,7 @@ class adminController {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
       const { story, scenes } = req.body;
-
+      console.log('stroyyyyyyyyyyyyyyyyyyyyyyyy',story)
       const id = req.params.id;
 
       if (!story) {
@@ -294,6 +294,10 @@ class adminController {
       const incomingNegativeTags = story.negativeMannerTags || [];
       const incomingPositiveTags = story.positiveMannerTags || [];
 
+      let published_date:any = null
+      if(story.status=='published'){
+        published_date = new Date();
+      }
       // --- NEGATIVE TAGS ---
       for (const tag of incomingNegativeTags) {
         const trimmedTag = tag.trim();
@@ -355,9 +359,11 @@ class adminController {
           }
         }
 
+        published_date = storyExist.published_date!=null?storyExist.published_date:published_date;
+
         const updateStory = await Story.findByIdAndUpdate(
           id,
-          { ...story },
+          { ...story,published_date },
           { new: true }
         );
 
@@ -372,7 +378,7 @@ class adminController {
         });
       }
       // 1. Save story
-      const newStory = await Story.create(story);
+      const newStory = await Story.create({...story,published_date});
 
       // 2. Save scenes linked with storyId
       let savedScenes: any[] = [];
