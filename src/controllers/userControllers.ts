@@ -295,7 +295,7 @@ class userController {
               ...story,
               total_number_of_reviews,
               total_number_of_readers,
-              average_rating,
+              average_rating:Number(average_rating.toFixed(2)),
               min_minutes_to_read,
               total_scenes,
             };
@@ -336,6 +336,7 @@ class userController {
           let storyViewArray = Array.from(hashmap.entries());
           // [[storyId, count], [storyId, count], ...]
 
+          console.log('sortViewArrayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy',storyViewArray)
           if (storyViewArray.length > 0) {
             // Step 3: Sort by views (descending)
             storyViewArray.sort((a, b) => b[1] - a[1]);
@@ -385,6 +386,9 @@ class userController {
           await UserActivity.create({ userId });
         }
 
+        featured_stories = featured_stories.sort((a:any,b:any)=>Number((b as any).total_number_of_readers) - (a as any).total_number_of_readers)
+
+
         return ResponseHandler.send(res, {
           statusCode: 200,
           status: "success",
@@ -417,10 +421,7 @@ class userController {
             let total_reviews = await StoryReview.find({
               storyId: story._id,
             }).select("rating");
-            console.log(
-              "total_reviewsssssssssssssssssssssssssss",
-              total_reviews
-            );
+
             let total_rating_of_all_reviews = total_reviews.reduce(
               (sum: any, arr: any) => sum + Number(arr.rating),
               0
@@ -435,7 +436,7 @@ class userController {
               ...story,
               total_number_of_reviews,
               total_number_of_readers,
-              average_rating,
+              average_rating:Number(average_rating.toFixed(2)),
               min_minutes_to_read,
               total_scenes,
             };
@@ -482,6 +483,8 @@ class userController {
         if (!recentActivity) {
           await UserActivity.create({ userId });
         }
+
+        featured_stories = featured_stories.sort((a:any,b:any)=>Number((b as any).total_number_of_readers) - (a as any).total_number_of_readers)
 
         return ResponseHandler.send(res, {
           statusCode: 200,
