@@ -63,6 +63,7 @@ import morgan from "morgan";
 import {connectDB} from "./config/MongoDB.js"
 import { initiateAdmin } from "./helpers/initiateAdmin.js";
 import cors from 'cors';
+import revenueCatController from "./controllers/revenueCatController.js";
 dotenv.config();
 
 const app = express();
@@ -74,6 +75,7 @@ app.use(cors());
 connectDB(mongoURI).then(()=>{
     console.log("mongggooooooooooooooooooooooooooooooooooooooooooooooo",mongoURI)
     app.use(morgan("dev"));
+    app.post('/api/revenuecat/webhook',express.raw({ type: 'application/json' }),revenueCatController.webhook)
     app.use(express.json());
     app.get('/',(req:Request,res:Response)=>{
         return res.status(200).json({message:"Server is working fine ✅"})
