@@ -54,7 +54,7 @@ class userController {
 
       // -------- EXPIRATION --------
       else if (eventType === "EXPIRATION") {
-        subscription_plan = "free";
+        subscription_plan = "free_trial";
       }
 
       // -------- UNCANCELLATION --------
