@@ -5,7 +5,7 @@ import userControllers from "../controllers/userControllers.js";
 import {upload} from '../config/multerConfig.js'
 const router = Router();
 
-router.post("/me",verifyToken,verifyUser,userControllers.getMyDetails);
+router.get("/me",verifyToken,verifyUser,userControllers.getMyDetails);
 router.put("/update-me",verifyToken,verifyUser,userControllers.updateMyDetails);
 router.put("/change-password",verifyToken,verifyUser,userControllers.changePassword);
 router.post("/reset-password",verifyToken,verifyUser,userControllers.resetPassword);
