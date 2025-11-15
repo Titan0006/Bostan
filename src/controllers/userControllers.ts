@@ -40,7 +40,7 @@ class userController {
     try {
       const user = (req as any).user;
 
-      const user_details = await User.findOne({ _id: user.id }).populate(
+      const user_details = await User.findOne({ _id: user.id }).select(
         "-password"
       );
 
