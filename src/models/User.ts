@@ -12,7 +12,7 @@ const userSchema = new Schema<IUser>(
       trim: true,
       required: false,
       default: "free_trial",
-      enum: ["free_trial", "monthly", "yearly"],
+      enum: ["free_trial","unsubscribed", "monthly", "yearly"],
     },
     is_guest: { type: Boolean, default: false, required: false },
     is_active: { type: Boolean, default: true, required: false },
