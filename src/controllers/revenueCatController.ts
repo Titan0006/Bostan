@@ -64,6 +64,11 @@ class userController {
         if (productId.includes("monthly")) subscription_plan = "monthly";
         if (productId.includes("yearly")) subscription_plan = "yearly";
       }
+      else if (eventType === "BILLING_RETRY" || eventType === "PAYMENT_FAILURE") {
+        console.log(`⚠️ Payment failed for user ${userId}`);
+        subscription_plan = "unsubscribed";
+        // Optional: you could also downgrade subscription here, or leave it until expiration
+      }
 
       // If event should change plan → update DB
       let updated_user = null;
