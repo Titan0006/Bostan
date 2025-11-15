@@ -37,6 +37,7 @@ class userController {
 
       // 2️⃣ Determine subscription plan
       let subscription_plan = null;
+      let has_cancelled_subscription = false;
 
       // -------- PURCHASE / RENEWAL --------
       if (eventType === "INITIAL_PURCHASE" || eventType === "RENEWAL") {
@@ -49,6 +50,7 @@ class userController {
         // Do NOT remove subscription immediately.
         // User keeps access until expiration.
         console.log("📌 User cancelled auto-renew");
+        has_cancelled_subscription = true;
         // No change in subscription_plan
       }
 
@@ -68,7 +70,7 @@ class userController {
       if (subscription_plan !== null) {
         updated_user = await User.findByIdAndUpdate(
           userId,
-          { subscription_plan },
+          { subscription_plan,has_cancelled_subscription },
           { new: true }
         );
 
