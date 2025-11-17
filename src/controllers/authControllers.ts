@@ -139,6 +139,7 @@ class AuthController {
         await EmailService.sendOtpEmail(email, otp);
         await OTP.create({
           otp,
+          user_id:existing_email._id,
           type: "email",
           user_type: "user",
           email: email,
@@ -518,9 +519,11 @@ class AuthController {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
       const { email, otp } = req.body;
-
+      console.log('email otp',email,otp);
+      
       const user_details = await User.findOne({ email: email });
-
+      console.log('user_details',user_details);
+      
       if (otp != "7878") {
         const otpExists = await OTP.findOne({
           otp,
@@ -528,6 +531,7 @@ class AuthController {
           type: "email",
           user_type: "user",
         });
+        console.log('otp_existtttttttttttttttttttttttt',otpExists);
 
         if (!otpExists) {
           return ResponseHandler.send(res, {
