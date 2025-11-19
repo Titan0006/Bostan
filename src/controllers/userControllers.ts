@@ -9,6 +9,7 @@ import {
   StoryReview,
   StoryScenes,
   UserActivity,
+  RevenueCatTransactionLog,
 } from "../models/index.js";
 import ResponseHandler from "../utils/responseHandler.js";
 import getMessage from "../i18n/index.js";
@@ -45,12 +46,18 @@ class userController {
         "-password"
       );
 
+      let allEvents = await RevenueCatTransactionLog.find({user_id:user.id}).sort({createdAt:-1});
+
+      let latest_event = allEvents[0]
+      let purchased_at = new Date(latest_event.raw_event.purchased_at_ms);
+      let expiration_at = new Date(latest_event.raw_event.expiration_at_ms);
+
       return ResponseHandler.send(res, {
         statusCode: 200,
         status: "success",
         msgCode: 1013,
         msg: getMessage(1013, languageCode),
-        data: user_details,
+        data: {...user_details,purchased_at,expiration_at},
       });
     } catch (error) {
       console.error("Error in userSignup of AuthController", error);
