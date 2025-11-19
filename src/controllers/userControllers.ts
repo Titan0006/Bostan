@@ -33,6 +33,7 @@ class userController {
     this.getRandomStories = this.getRandomStories.bind(this);
     this.getAllMyReviews = this.getAllMyReviews.bind(this);
     this.resetPassword = this.resetPassword.bind(this);
+    this.getAllMannerTags = this.getAllMannerTags.bind(this);
   }
 
   async getMyDetails(req: Request, res: Response) {
@@ -152,10 +153,10 @@ class userController {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
       const user = (req as any).user;
-      console.log("userrrrrrrrrrrrrrr",user)
+      console.log("userrrrrrrrrrrrrrr", user);
       const { current_password, new_password } = req.body;
-      console.log("bodyyyyyyyyyyyyy",req.body)
-      
+      console.log("bodyyyyyyyyyyyyy", req.body);
+
       if (
         !current_password ||
         !new_password ||
@@ -183,7 +184,7 @@ class userController {
 
       let existing_user = await User.findOne({ _id: user.id });
       let response = await existing_user?.comparePassword(current_password);
-      console.log('responseeeeeeeeeeeeeeeee',response)
+      console.log("responseeeeeeeeeeeeeeeee", response);
       if (!response) {
         return ResponseHandler.send(res, {
           statusCode: 400,
@@ -295,7 +296,7 @@ class userController {
               ...story,
               total_number_of_reviews,
               total_number_of_readers,
-              average_rating:Number(average_rating.toFixed(2)),
+              average_rating: Number(average_rating.toFixed(2)),
               min_minutes_to_read,
               total_scenes,
             };
@@ -336,7 +337,10 @@ class userController {
           let storyViewArray = Array.from(hashmap.entries());
           // [[storyId, count], [storyId, count], ...]
 
-          console.log('sortViewArrayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy',storyViewArray)
+          console.log(
+            "sortViewArrayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+            storyViewArray
+          );
           if (storyViewArray.length > 0) {
             // Step 3: Sort by views (descending)
             storyViewArray.sort((a, b) => b[1] - a[1]);
@@ -386,8 +390,11 @@ class userController {
           await UserActivity.create({ userId });
         }
 
-        featured_stories = featured_stories.sort((a:any,b:any)=>Number((b as any).total_number_of_readers) - (a as any).total_number_of_readers)
-
+        featured_stories = featured_stories.sort(
+          (a: any, b: any) =>
+            Number((b as any).total_number_of_readers) -
+            (a as any).total_number_of_readers
+        );
 
         return ResponseHandler.send(res, {
           statusCode: 200,
@@ -436,7 +443,7 @@ class userController {
               ...story,
               total_number_of_reviews,
               total_number_of_readers,
-              average_rating:Number(average_rating.toFixed(2)),
+              average_rating: Number(average_rating.toFixed(2)),
               min_minutes_to_read,
               total_scenes,
             };
@@ -484,7 +491,11 @@ class userController {
           await UserActivity.create({ userId });
         }
 
-        featured_stories = featured_stories.sort((a:any,b:any)=>Number((b as any).total_number_of_readers) - (a as any).total_number_of_readers)
+        featured_stories = featured_stories.sort(
+          (a: any, b: any) =>
+            Number((b as any).total_number_of_readers) -
+            (a as any).total_number_of_readers
+        );
 
         return ResponseHandler.send(res, {
           statusCode: 200,
@@ -625,8 +636,10 @@ class userController {
       let story_of_the_week = await StoryOfTheWeek.findOne({});
 
       let isStoryOfWeek = false;
-      if(story_of_the_week){
-        if((story_of_the_week as any).storyId.toString()===story._id.toString()){
+      if (story_of_the_week) {
+        if (
+          (story_of_the_week as any).storyId.toString() === story._id.toString()
+        ) {
           isStoryOfWeek = true;
         }
       }
@@ -754,7 +767,7 @@ class userController {
 
     try {
       // 🔍 Get search query
-      
+
       const search = (req.query.search as string) || "";
 
       // 🔢 Parse pagination params
@@ -833,8 +846,13 @@ class userController {
         .populate("storyId")
         .lean();
 
-      console.log("all_reviewsssssssssssssssssssssssssssssssssssss",all_reviews)
-      all_reviews = all_reviews.filter((entry:any)=>entry.storyId && entry.storyId._id)
+      console.log(
+        "all_reviewsssssssssssssssssssssssssssssssssssss",
+        all_reviews
+      );
+      all_reviews = all_reviews.filter(
+        (entry: any) => entry.storyId && entry.storyId._id
+      );
 
       all_reviews = await Promise.all(
         all_reviews.map(async (r: any) => {
@@ -855,6 +873,43 @@ class userController {
       });
     } catch (error) {
       console.error("Error in getAllStoriesAccordingToFilter:", error);
+      return ResponseHandler.send(res, {
+        statusCode: 500,
+        status: "error",
+        msgCode: 500,
+        msg: getMessage(500, languageCode),
+        data: null,
+      });
+    }
+  }
+
+  async getAllMannerTags(req: Request, res: Response) {
+    let languageCode = (req.headers["language"] as string) || "en";
+    try {
+      //fetch all stories and then only send their manner tags
+
+      let all_stories = await Story.find({ status: "published" }).lean();
+      let positiveMannerTags: any = [];
+      let negativeMannerTags: any = [];
+
+      all_stories.map((story: any) => {
+        let positiveMannerTagsOfStory = story.positiveMannerTags;
+        let negativeMannerTagsOfStory = story.negativeMannerTags;
+        positiveMannerTags.push(...positiveMannerTagsOfStory);
+        negativeMannerTags.push(...negativeMannerTagsOfStory);
+      });
+
+      let allTags = { positiveMannerTags, negativeMannerTags };
+
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1013, //
+        msg: getMessage(1013, languageCode),
+        data: allTags,
+      });
+    } catch (error) {
+      console.error("Error in getAllmannerTags:", error);
       return ResponseHandler.send(res, {
         statusCode: 500,
         status: "error",

@@ -544,65 +544,33 @@ class adminController {
       //     tagType:'positive'
       //   })
       // })
-      let bearer_token = (req.headers["authorization"] as string) || "";
-      let secret_key = "Secret_Key";
-      let user = jwt.verify(
-        bearer_token.split(" ")[1],
-        secret_key
-      ) as JwtPayload;
 
-      console.log("uiser iusre iuser", user);
-      if (user.type == "user") {
-        //fetch all stories and then only send their manner tags
+      let mannerTags = await MannerTags.find({});
+      let positiveMannerTags = mannerTags
+        .map((m: any) => {
+          if (m.tagType == "positive") {
+            return m.tagName;
+          }
+        })
+        .filter((m) => m != null);
 
-        let all_stories = await Story.find({}).lean();
-        let positiveMannerTags: any = [];
-        let negativeMannerTags: any = [];
+      let negativeMannerTags = mannerTags
+        .map((m: any) => {
+          if (m.tagType == "negative") {
+            return m.tagName;
+          }
+        })
+        .filter((m) => m != null);
 
-        all_stories.map((story: any) => {
-          let positiveMannerTagsOfStory = story.positiveMannerTags;
-          let negativeMannerTagsOfStory = story.negativeMannerTags;
-          positiveMannerTags.push(...positiveMannerTagsOfStory);
-          negativeMannerTags.push(...negativeMannerTagsOfStory);
-        });
+      let allTags = { positiveMannerTags, negativeMannerTags };
 
-        let allTags = { positiveMannerTags, negativeMannerTags };
-
-        return ResponseHandler.send(res, {
-          statusCode: 200,
-          status: "success",
-          msgCode: 1013, //
-          msg: getMessage(1013, languageCode),
-          data: allTags,
-        });
-      } else {
-        let mannerTags = await MannerTags.find({});
-        let positiveMannerTags = mannerTags
-          .map((m: any) => {
-            if (m.tagType == "positive") {
-              return m.tagName;
-            }
-          })
-          .filter((m) => m != null);
-
-        let negativeMannerTags = mannerTags
-          .map((m: any) => {
-            if (m.tagType == "negative") {
-              return m.tagName;
-            }
-          })
-          .filter((m) => m != null);
-
-        let allTags = { positiveMannerTags, negativeMannerTags };
-
-        return ResponseHandler.send(res, {
-          statusCode: 200,
-          status: "success",
-          msgCode: 1013, //
-          msg: getMessage(1013, languageCode),
-          data: allTags,
-        });
-      }
+      return ResponseHandler.send(res, {
+        statusCode: 200,
+        status: "success",
+        msgCode: 1013, //
+        msg: getMessage(1013, languageCode),
+        data: allTags,
+      });
     } catch (error) {
       console.error("Error in getAllmannerTags:", error);
       return ResponseHandler.send(res, {
