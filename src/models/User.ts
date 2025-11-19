@@ -12,12 +12,13 @@ const userSchema = new Schema<IUser>(
       trim: true,
       required: false,
       default: "unsubscribed",
-      enum: ["unsubscribed","free_trial","monthly", "yearly"],
+      enum: ["unsubscribed","monthly", "yearly"],
     },
     is_guest: { type: Boolean, default: false, required: false },
     is_active: { type: Boolean, default: true, required: false },
     has_cancelled_subscription: { type: Boolean, default: false, required: false },
     is_deleted: { type: Boolean, default: false, required: false },
+    free_trial:{ type: Boolean, default: false, required: false }
   },
   { timestamps: true }
 );
