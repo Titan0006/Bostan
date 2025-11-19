@@ -52,7 +52,7 @@ class userController {
       console.log('latest_eventlatest_eventlatest_event',allEvents)
       let purchased_at = latest_event?new Date(latest_event.raw_event.purchased_at_ms):null;
       let expiration_at =latest_event?new Date(latest_event.raw_event.expiration_at_ms):null;
-      let previously_subscribed = allEvents.length==0
+      let previously_subscribed = allEvents.length>0?true:false
       return ResponseHandler.send(res, {
         statusCode: 200,
         status: "success",
