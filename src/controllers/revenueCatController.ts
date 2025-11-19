@@ -208,6 +208,7 @@ class userController {
       }
 
       const event = body.event || {};
+      console.log('revenue cat event',event);
       const appUserId = event.app_user_id;
       const eventType = event.type || "";
       const productId = (event.product_id || "").toLowerCase();
