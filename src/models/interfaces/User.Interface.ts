@@ -10,5 +10,6 @@ export interface IUser {
   is_deleted:boolean;
   is_guest:boolean;
   has_cancelled_subscription:boolean;
+  free_trial:boolean; // for 7 days free trails
   comparePassword(candidatePassword:string):Promise<boolean>;
 }
