@@ -10,6 +10,7 @@ import { IStoryScenes } from "./StoryScenes.Interface.js";
 import { IStoryOfTheWeek } from "./StoryOfTheWeek.Interface.js";
 import { IStoryReview } from "./StoryReview.Interface.js";
 import {IUserActivity} from "./UserActivity.Interface.js";
+import {IRevenueCatTransactionLog} from "./RevenueCatTransactionLog.Interface.js";
 
 export {
   IUser,
@@ -23,5 +24,6 @@ export {
   IStoryScenes,
   IStoryOfTheWeek,
   IStoryReview,
-  IUserActivity
+  IUserActivity,
+  IRevenueCatTransactionLog
 };

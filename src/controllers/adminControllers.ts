@@ -15,7 +15,7 @@ import getMessage from "../i18n/index.js";
 import TwilioService from "../helpers/twilioService.js";
 import EmailService from "../helpers/SendMail.js";
 import { generateOTP } from "../utils/generateOTP.js";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { negativeMannerTags } from "../helpers/NegativeMannerTags.js";
 import { positiveMannerTags } from "../helpers/PositiveMannerTags.js";
 import MannerTags from "../models/MannerTags.js";
@@ -157,7 +157,7 @@ class adminController {
           data: null,
         });
       }
-      console.log('bpdyyyyyyyyyyyyyyyyyyyyyyyyy',body);
+      console.log("bpdyyyyyyyyyyyyyyyyyyyyyyyyy", body);
       const updated_user = await User.findByIdAndUpdate(id, body, {
         new: true,
       });
@@ -228,7 +228,7 @@ class adminController {
 
       // Base filter
       let filter: any = {
-        is_guest:false
+        is_guest: false,
       };
 
       // Add search condition (assuming searching in "name" and "email")
@@ -279,7 +279,7 @@ class adminController {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
       const { story, scenes } = req.body;
-      console.log('stroyyyyyyyyyyyyyyyyyyyyyyyy',story)
+      console.log("stroyyyyyyyyyyyyyyyyyyyyyyyy", story);
       const id = req.params.id;
 
       if (!story) {
@@ -294,8 +294,8 @@ class adminController {
       const incomingNegativeTags = story.negativeMannerTags || [];
       const incomingPositiveTags = story.positiveMannerTags || [];
 
-      let published_date:any = null
-      if(story.status=='published'){
+      let published_date: any = null;
+      if (story.status == "published") {
         published_date = new Date();
       }
       // --- NEGATIVE TAGS ---
@@ -359,11 +359,14 @@ class adminController {
           }
         }
 
-        published_date = storyExist.published_date!=null?storyExist.published_date:published_date;
+        published_date =
+          storyExist.published_date != null
+            ? storyExist.published_date
+            : published_date;
 
         const updateStory = await Story.findByIdAndUpdate(
           id,
-          { ...story,published_date },
+          { ...story, published_date },
           { new: true }
         );
 
@@ -378,7 +381,7 @@ class adminController {
         });
       }
       // 1. Save story
-      const newStory = await Story.create({...story,published_date});
+      const newStory = await Story.create({ ...story, published_date });
 
       // 2. Save scenes linked with storyId
       let savedScenes: any[] = [];
@@ -502,15 +505,16 @@ class adminController {
   async getStoryOfTheWeek(req: Request, res: Response) {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
-
-      let story_of_the_week = await StoryOfTheWeek.find().populate('storyId').lean();
+      let story_of_the_week = await StoryOfTheWeek.find()
+        .populate("storyId")
+        .lean();
 
       return ResponseHandler.send(res, {
         statusCode: 200,
         status: "success",
         msgCode: 1042,
         msg: getMessage(1042, languageCode),
-        data: {...story_of_the_week[0].storyId,isStoryOfWeek:true},
+        data: { ...story_of_the_week[0].storyId, isStoryOfWeek: true },
       });
     } catch (error) {
       console.error("Error in createStoryWithScenes:", error);
@@ -540,32 +544,65 @@ class adminController {
       //     tagType:'positive'
       //   })
       // })
-      let mannerTags = await MannerTags.find({});
-      let positiveMannerTags = mannerTags
-        .map((m: any) => {
-          if (m.tagType == "positive") {
-            return m.tagName;
-          }
-        })
-        .filter((m) => m != null);
+      let bearer_token = (req.headers["authorization"] as string) || "";
+      let secret_key = "Secret_Key";
+      let user = jwt.verify(
+        bearer_token.split(" ")[1],
+        secret_key
+      ) as JwtPayload;
 
-      let negativeMannerTags = mannerTags
-        .map((m: any) => {
-          if (m.tagType == "negative") {
-            return m.tagName;
-          }
-        })
-        .filter((m) => m != null);
+      console.log("uiser iusre iuser", user);
+      if (user.type == "user") {
+        //fetch all stories and then only send their manner tags
 
-      let allTags = { positiveMannerTags, negativeMannerTags };
+        let all_stories = await Story.find({}).lean();
+        let positiveMannerTags: any = [];
+        let negativeMannerTags: any = [];
 
-      return ResponseHandler.send(res, {
-        statusCode: 200,
-        status: "success",
-        msgCode: 1013, //
-        msg: getMessage(1013, languageCode),
-        data: allTags,
-      });
+        all_stories.map((story: any) => {
+          let positiveMannerTagsOfStory = story.positiveMannerTags;
+          let negativeMannerTagsOfStory = story.negativeMannerTags;
+          positiveMannerTags.push(...positiveMannerTagsOfStory);
+          negativeMannerTags.push(...negativeMannerTagsOfStory);
+        });
+
+        let allTags = { positiveMannerTags, negativeMannerTags };
+
+        return ResponseHandler.send(res, {
+          statusCode: 200,
+          status: "success",
+          msgCode: 1013, //
+          msg: getMessage(1013, languageCode),
+          data: allTags,
+        });
+      } else {
+        let mannerTags = await MannerTags.find({});
+        let positiveMannerTags = mannerTags
+          .map((m: any) => {
+            if (m.tagType == "positive") {
+              return m.tagName;
+            }
+          })
+          .filter((m) => m != null);
+
+        let negativeMannerTags = mannerTags
+          .map((m: any) => {
+            if (m.tagType == "negative") {
+              return m.tagName;
+            }
+          })
+          .filter((m) => m != null);
+
+        let allTags = { positiveMannerTags, negativeMannerTags };
+
+        return ResponseHandler.send(res, {
+          statusCode: 200,
+          status: "success",
+          msgCode: 1013, //
+          msg: getMessage(1013, languageCode),
+          data: allTags,
+        });
+      }
     } catch (error) {
       console.error("Error in getAllmannerTags:", error);
       return ResponseHandler.send(res, {
@@ -785,16 +822,14 @@ class adminController {
     try {
       let search = (req.query.search as string) || "";
 
-      let filters: any = {status:'published'};
+      let filters: any = { status: "published" };
 
       if (search && search.trim() != "") {
         const regex = new RegExp(search.trim(), "i");
         filters.$or = [{ title: regex }];
       }
 
-      let stories = await Story.find(filters)
-        .sort({ createdAt: -1 })
-        .lean();
+      let stories = await Story.find(filters).sort({ createdAt: -1 }).lean();
 
       stories = await Promise.all(
         stories.map(async (story: any) => {
@@ -808,7 +843,7 @@ class adminController {
       return ResponseHandler.send(res, {
         statusCode: 200,
         status: "success",
-        msgCode: 1013, 
+        msgCode: 1013,
         msg: getMessage(1013, languageCode),
         data: {
           stories,
@@ -854,7 +889,6 @@ class adminController {
   async removeStoryOfTheWeek(req: Request, res: Response) {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
-    
       await StoryOfTheWeek.deleteMany({});
 
       return ResponseHandler.send(res, {
@@ -963,8 +997,8 @@ class adminController {
       }
 
       await StoryScenes.deleteMany({ storyId: id });
-      await StoryReview.deleteMany({storyId:id});
-      await StoryView.deleteMany({storyId:id});
+      await StoryReview.deleteMany({ storyId: id });
+      await StoryView.deleteMany({ storyId: id });
 
       return ResponseHandler.send(res, {
         statusCode: 200,
