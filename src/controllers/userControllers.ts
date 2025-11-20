@@ -49,7 +49,7 @@ class userController {
       let allEvents = await RevenueCatTransactionLog.find({user_id:user.id}).sort({createdAt:-1}).lean();
 
       let latest_event = allEvents[0];
-      console.log('latest_eventlatest_eventlatest_event',allEvents)
+      // console.log('latest_eventlatest_eventlatest_event',allEvents)
       let purchased_at = latest_event?new Date(latest_event.raw_event.purchased_at_ms):null;
       let expiration_at =latest_event?new Date(latest_event.raw_event.expiration_at_ms):null;
       let previously_subscribed = allEvents.length>0?true:false
