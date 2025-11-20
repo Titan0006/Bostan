@@ -266,9 +266,9 @@ class userController {
       // ===========================================================
       if (eventType === "TRIAL_STARTED") {
         free_trial = true;
-        subscription_expiration = event.expires_at
-          ? new Date(event.expires_at)
-          : null;
+        // subscription_expiration = event.expires_at
+        //   ? new Date(event.expires_at)
+        //   : null;
       }
 
       // ===========================================================
@@ -278,9 +278,9 @@ class userController {
         if (productId.includes("monthly")) subscription_plan = "monthly";
         if (productId.includes("yearly")) subscription_plan = "yearly";
 
-        subscription_expiration = event.expires_at
-          ? new Date(event.expires_at)
-          : null;
+        // subscription_expiration = event.expires_at
+        //   ? new Date(event.expires_at)
+        //   : null;
 
         // ⭐ Trial → Paid (THIS MATTERS!)
         if (event.is_trial_conversion === true) {
@@ -289,7 +289,7 @@ class userController {
         }
 
         // Initial purchase but still in trial
-        if (eventType === "INITIAL_PURCHASE" && periodType === "trial") {
+        if (eventType === "INITIAL_PURCHASE" && (periodType === "trial" || periodType === "TRIAL")) {
           free_trial = true;
         }
       }
@@ -299,9 +299,9 @@ class userController {
       // ===========================================================
       else if (eventType === "CANCELLATION") {
         has_cancelled_subscription = true;
-        subscription_expiration = event.expires_at
-          ? new Date(event.expires_at)
-          : null;
+        // subscription_expiration = event.expires_at
+        //   ? new Date(event.expires_at)
+        //   : null;
       }
 
       // ===========================================================
@@ -344,7 +344,6 @@ class userController {
           {
             subscription_plan,
             has_cancelled_subscription,
-            subscription_expiration,
             free_trial,
           },
           { new: true }
