@@ -256,8 +256,8 @@ class userController {
       // -----------------------------
       // 3) Interpret Subscription State
       // -----------------------------
-      let subscription_plan = "unsubscribed";
-      let has_cancelled_subscription = false;
+      let subscription_plan = internalUser?.subscription_plan;
+      let has_cancelled_subscription = internalUser!.has_cancelled_subscription;
       let free_trial = periodType === "trial";
       let subscription_expiration = null;
 
