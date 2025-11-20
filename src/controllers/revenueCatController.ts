@@ -276,7 +276,7 @@ class userController {
       // ===========================================================
       else if (eventType === "INITIAL_PURCHASE" || eventType === "RENEWAL") {
         if (productId.includes("p1m") || productId.includes("monthly")) subscription_plan = "monthly";
-        if (productId.includes("p1y") || productId.includes("monthly")) subscription_plan = "yearly";
+        if (productId.includes("p1y") || productId.includes("yearly")) subscription_plan = "yearly";
 
         // subscription_expiration = event.expires_at
         //   ? new Date(event.expires_at)
@@ -318,8 +318,8 @@ class userController {
       // ===========================================================
       else if (eventType === "UNCANCELLATION") {
         has_cancelled_subscription = false;
-        if (productId.includes("p1m")) subscription_plan = "monthly";
-        if (productId.includes("p1y")) subscription_plan = "yearly";
+        if (productId.includes("p1m") || productId.includes("monthly")) subscription_plan = "monthly";
+        if (productId.includes("p1y") || productId.includes("yearly")) subscription_plan = "yearly";
       }
 
       // ===========================================================
