@@ -6,7 +6,7 @@ import TwilioService from "../helpers/twilioService.js";
 import EmailService from "../helpers/SendMail.js";
 import { generateOTP } from "../utils/generateOTP.js";
 import jwt from "jsonwebtoken";
-import crypto from 'crypto';
+import crypto from "crypto";
 
 class AuthController {
   constructor() {
@@ -29,7 +29,9 @@ class AuthController {
     try {
       const { email } = req.body;
 
-      const existing_email = await User.findOne({ email: email });
+      const existing_email = await User.findOne({
+        email: { $regex: `^${email}$`, $options: "i" },
+      });
 
       if (existing_email) {
         return ResponseHandler.send(res, {
@@ -102,7 +104,7 @@ class AuthController {
         status: "success",
         msgCode: 1035,
         msg: getMessage(1035, languageCode),
-        data: {token,is_guest:true},
+        data: { token, is_guest: true },
       });
     } catch (error) {
       console.error("Error in userSignup of AuthController", error);
@@ -139,7 +141,7 @@ class AuthController {
         await EmailService.sendOtpEmail(email, otp);
         await OTP.create({
           otp,
-          user_id:existing_email._id,
+          user_id: existing_email._id,
           type: "email",
           user_type: "user",
           email: email,
@@ -197,7 +199,12 @@ class AuthController {
     try {
       const { full_name, email, password, otp } = req.body;
 
-      const existing_email = await User.findOne({ email: email });
+      const existing_email = await User.findOne({
+        email: {
+          $regex: `^${email}$`,
+          $options: "i",
+        },
+      });
 
       if (existing_email) {
         return ResponseHandler.send(res, {
@@ -210,7 +217,10 @@ class AuthController {
       }
 
       if (otp != "7878") {
-        let otpVerify = await OTP.findOne({ email, otp });
+        let otpVerify = await OTP.findOne({
+          email: { $regex: `^${email}$`, $options: "i" },
+          otp,
+        });
 
         if (!otpVerify) {
           return ResponseHandler.send(res, {
@@ -255,7 +265,7 @@ class AuthController {
         );
       }
 
-      await OTP.deleteMany({ email });
+      await OTP.deleteMany({ email: { $regex: `^${email}$`, $options: "i" } });
       return ResponseHandler.send(res, {
         statusCode: 200,
         status: "success",
@@ -519,11 +529,11 @@ class AuthController {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
       const { email, otp } = req.body;
-      console.log('email otp',email,otp);
-      
+      console.log("email otp", email, otp);
+
       const user_details = await User.findOne({ email: email });
-      console.log('user_details',user_details);
-      
+      console.log("user_details", user_details);
+
       if (otp != "7878") {
         const otpExists = await OTP.findOne({
           otp,
@@ -531,7 +541,7 @@ class AuthController {
           type: "email",
           user_type: "user",
         });
-        console.log('otp_existtttttttttttttttttttttttt',otpExists);
+        console.log("otp_existtttttttttttttttttttttttt", otpExists);
 
         if (!otpExists) {
           return ResponseHandler.send(res, {
