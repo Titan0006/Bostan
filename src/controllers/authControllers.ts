@@ -598,7 +598,7 @@ class AuthController {
       //   {subscription_plan:"free_trial"},
       //   {$set:{subscription_plan : "unsubscribed"}})
 
-      const existing_email = await User.findOne({ email: email });
+      const existing_email = await User.findOne({email: { $regex: `^${email}$`, $options: "i" }});
 
       if (!existing_email) {
         return ResponseHandler.send(res, {
