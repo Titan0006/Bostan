@@ -594,7 +594,9 @@ class AuthController {
     try {
       const { email, password } = req.body;
 
-      const user_details = await User.findOne({ email: email });
+      // await User.updateMany(
+      //   {subscription_plan:"free_trial"},
+      //   {$set:{subscription_plan : "unsubscribed"}})
 
       const existing_email = await User.findOne({ email: email });
 

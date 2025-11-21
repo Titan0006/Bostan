@@ -691,7 +691,7 @@ class adminController {
           User.countDocuments(dateFilter),
           Story.countDocuments(dateFilter),
           User.countDocuments({
-            subscription_plan: { $ne: "free_trial" },
+            subscription_plan: { $ne: "unsubscribed" },
             ...dateFilter,
           }),
           UserActivity.countDocuments(dateFilter),
