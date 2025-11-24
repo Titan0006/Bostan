@@ -95,7 +95,7 @@ class AuthController {
         },
         secret_key,
         {
-          expiresIn: "7d",
+          expiresIn: "90d",
         }
       );
 
@@ -260,7 +260,7 @@ class AuthController {
           { email, id: new_user._id, type: "user", is_guest: false },
           secret_key,
           {
-            expiresIn: "10y",
+            expiresIn: "90d",
           }
         );
       }
@@ -400,7 +400,7 @@ class AuthController {
         { email, id: userExists._id, type: "user" },
         secret_key,
         {
-          expiresIn: "10y",
+          expiresIn: "90d",
         }
       );
 
@@ -665,7 +665,7 @@ class AuthController {
         { email: admin_exists?.email, type: "admin", id: admin_exists._id },
         secret_key,
         {
-          expiresIn: "1y",
+          expiresIn: "90d",
         }
       );
       return ResponseHandler.send(res, {
