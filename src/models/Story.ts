@@ -3,7 +3,7 @@ import { Schema, model } from "mongoose";
 
 const storySchema = new Schema<IStory>( // poster,logo,logline,plotSummary,mannerTags
   {
-    title: { type: String, trim: true, required: true, default: "" },  // title,
+    title: { type: String, trim: true, required: true, default: "" }, // title,
     logo: { type: String, trim: true, required: false, default: "" },
     base_poster: { type: String, trim: true, required: false },
     landscape_poster: { type: String, trim: true, required: false },
@@ -12,15 +12,21 @@ const storySchema = new Schema<IStory>( // poster,logo,logline,plotSummary,manne
     logline: { type: String, default: "", required: false },
     is_featured: { type: Boolean, default: false, required: false },
     banner_story: { type: Boolean, default: false, required: false },
+    is_paid: {
+      type: Boolean,
+      default: true,
+    },
+
     status: {
       type: String,
       default: "draft",
-      enum: ["draft", "published","hide"],
+      enum: ["draft", "published", "hide"],
       required: false,
     },
+
     positiveMannerTags: [{ type: String, default: "", required: false }],
     negativeMannerTags: [{ type: String, default: "", required: false }],
-    published_date:{type:Date,default:null,required:false}
+    published_date: { type: Date, default: null, required: false },
   },
   { timestamps: true }
 );

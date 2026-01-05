@@ -415,6 +415,7 @@ class adminController {
       });
     }
   }
+  
   async createStoryScenes(req: Request, res: Response) {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
@@ -475,6 +476,7 @@ class adminController {
       });
     }
   }
+
   async addStoryOfTheWeek(req: Request, res: Response) {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
