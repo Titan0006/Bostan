@@ -13,6 +13,7 @@ export interface IStory {
   positiveMannerTags:string[],
   negativeMannerTags:string[],
   is_featured:boolean,
+  is_paid: boolean,
   banner_story:boolean
   published_date:Date;
 } 
