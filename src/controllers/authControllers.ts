@@ -218,7 +218,7 @@ class AuthController {
 
       if (otp != "7878") {
         let otpVerify = await OTP.findOne({
-          email: { $regex: `^${email}$`, $options: "i" },
+          email: email,
           otp,
         });
 

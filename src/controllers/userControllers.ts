@@ -311,6 +311,9 @@ class userController {
           })
         );
 
+        let free_stories = await await Story.find({status: "published",is_paid: false,})
+      .sort({ updatedAt: -1 }).limit(5).lean();
+
         let new_stories = await Story.find({ status: "published" })
           .sort({ createdAt: -1 })
           .limit(4);
@@ -414,6 +417,7 @@ class userController {
             new_stories,
             story_of_the_week,
             featured_stories,
+            free_stories
           },
         });
       } else {
@@ -457,6 +461,9 @@ class userController {
             };
           })
         );
+        
+         let free_stories = await await Story.find({status: "published",is_paid: false,})
+      .sort({ updatedAt: -1 }).limit(5).lean();
 
         let new_stories = await Story.find({ status: "published" })
           .sort({ createdAt: -1 })
@@ -486,7 +493,7 @@ class userController {
             };
           })
         );
-
+        
         let userId = (req as any).user.id;
 
         const twentyFourHourAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -515,6 +522,7 @@ class userController {
             new_stories,
             story_of_the_week,
             featured_stories,
+            free_stories
           },
         });
       }
@@ -890,7 +898,6 @@ class userController {
       });
     }
   }
-
   async getAllMannerTags(req: Request, res: Response) {
     let languageCode = (req.headers["language"] as string) || "en";
     try {
@@ -927,6 +934,7 @@ class userController {
       });
     }
   }
+
 }
 
 export default new userController();
